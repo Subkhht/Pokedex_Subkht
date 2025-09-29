@@ -4,7 +4,7 @@
 
 ## Estructura del Proyecto
 
-``
+````
 pokedex-app 
 ├── src 
 │ ├── index.html # Documento HTML principal 
@@ -16,7 +16,7 @@ pokedex-app
 │ └── types # Imágenes de los tipos de Pokémon (bug.png, fire.png, etc.) 
 │ └── pokedex.png # Icono de Pokédex para la pestaña 
 └── README.md # Documentación del proyecto
-``
+````
 
 ## Cómo usar la Pokédex
 
