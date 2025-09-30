@@ -9,6 +9,7 @@ pokedex-app
 │ ├── index.html # Documento HTML principal
 | ├── favorites.html # Documento HTML de favoritos
 | ├── team-builder.html # Constructor de equipos
+| ├── battle-simulator # Simulador de batallas 1v1
 │ ├── styles 
 │ │ └── main.css # Estilos de la aplicación 
 │ ├── scripts 
