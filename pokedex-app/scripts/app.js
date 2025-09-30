@@ -279,7 +279,7 @@ function saveFavorites() {
 }
 
 function getTypeIcon(typeName) {
-    return `pokedex-app/assets/types/${typeName}.png`;
+    return `/pokedex-app/assets/types/${typeName}.png`;
 }
 
 function getStatName(statName) {
