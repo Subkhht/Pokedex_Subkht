@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Constructor de Equipos - Pokédex</title>
+    <link rel="stylesheet" href="pokedex-app/styles/main.css">
+    <link rel="icon" type="image/png" href="pokedex-app/assets/pokedex.png">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #e52d27 0%, #b31217 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1.titulo {
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            text-align: center;
+            color: #ffcb05;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .search-box {
+            margin: 20px auto;
+            max-width: 500px;
+        }
+        #search-input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+        }
+        .team {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .team-slot {
+            width: 120px;
+            height: 120px;
+            background: #f0f0f0;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 14px;
+            text-align: center;
+        }
+        .team-pokemon {
+            background: white;
+            border: 2px solid #3b4cca;
+            border-radius: 10px;
+            padding: 5px;
+            cursor: pointer;
+        }
+        .team-pokemon img {
+            width: 60px;
+            height: 60px;
+            image-rendering: pixelated;
+        }
+        .team-pokemon .name {
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+        }
+        .analysis {
+            background: rgba(255,255,255,0.9);
+            padding: 15px;
+            border-radius: 10px;
+            color: #333;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e52d27;
+        }
+        .results {
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgb(0, 0, 0);
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+        .result-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .result-item:hover {
+            background: #fc0000;
+        }
+        .result-item img {
+            width: 32px;
+            height: 32px;
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Pokédex</h1>
+        <nav class="top-nav">
+            <a href="index.html" class="nav-link">Pokédex</a>
+            <a href="favorites.html" class="nav-link">Favoritos</a>
+            <a href="team-builder.html" class="nav-link active" style="text-align: center;">Constructor de Equipos</a>
+        </nav>
+    </header>
+
+    <div id="root"></div>
+
+    <!-- Cargar React y ReactDOM desde CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Tabla de tipos (simplificada para cálculo de sinergias)
+        const typeChart = {
+            normal: { rock: 0.5, ghost: 0, steel: 0.5 },
+            fire: { fire: 0.5, water: 0.5, grass: 2, ice: 2, bug: 2, rock: 0.5, dragon: 0.5 },
+            water: { fire: 2, water: 0.5, grass: 0.5, ground: 2, rock: 2, dragon: 0.5 },
+            electric: { water: 2, electric: 0.5, grass: 0.5, ground: 0, flying: 2, dragon: 0.5 },
+            grass: { fire: 0.5, water: 2, grass: 0.5, poison: 0.5, ground: 2, flying: 0.5, bug: 0.5, rock: 2, dragon: 0.5 },
+            ice: { fire: 0.5, water: 0.5, grass: 2, ice: 0.5, ground: 2, flying: 2, dragon: 2, steel: 0.5 },
+            fighting: { normal: 2, ice: 2, poison: 0.5, flying: 0.5, psychic: 0.5, bug: 0.5, rock: 2, ghost: 0, dark: 2, steel: 2, fairy: 0.5 },
+            poison: { grass: 2, poison: 0.5, ground: 0.5, rock: 0.5, ghost: 0.5, steel: 0, fairy: 2 },
+            ground: { fire: 2, electric: 2, grass: 0.5, poison: 2, flying: 0, bug: 0.5, rock: 2, steel: 2 },
+            flying: { electric: 0.5, grass: 2, fighting: 2, bug: 2, rock: 0.5, steel: 0.5 },
+            psychic: { fighting: 2, poison: 2, psychic: 0.5, dark: 0, steel: 0.5 },
+            bug: { fire: 0.5, grass: 2, fighting: 0.5, poison: 0.5, flying: 0.5, psychic: 2, ghost: 0.5, dark: 2, steel: 0.5, fairy: 0.5 },
+            rock: { fire: 2, ice: 2, fighting: 0.5, ground: 0.5, flying: 2, bug: 2, steel: 0.5 },
+            ghost: { normal: 0, psychic: 2, ghost: 2, dark: 0.5 },
+            dragon: { dragon: 2, steel: 0.5, fairy: 0 },
+            dark: { fighting: 0.5, psychic: 2, ghost: 2, dark: 0.5, fairy: 0.5 },
+            steel: { fire: 0.5, water: 0.5, electric: 0.5, ice: 2, rock: 2, fairy: 2 },
+            fairy: { fire: 0.5, fighting: 2, poison: 0.5, dragon: 2, dark: 2, steel: 0.5 }
+        };
+
+        function calculateTeamScore(team) {
+            if (team.length === 0) return 0;
+
+            // Tipos del equipo
+            const teamTypes = team.flatMap(p => p.types);
+
+            // Cobertura ofensiva: cuántos tipos puede golpear fuerte
+            const offensiveHits = new Set();
+            teamTypes.forEach(type => {
+                const weaknesses = typeChart[type];
+                if (weaknesses) {
+                    Object.entries(weaknesses).forEach(([defType, multiplier]) => {
+                        if (multiplier >= 2) offensiveHits.add(defType);
+                    });
+                }
+            });
+            const offensiveScore = Math.min(1, offensiveHits.size / 18);
+
+            // Resistencias defensivas
+            const resistances = new Set();
+            teamTypes.forEach(type => {
+                Object.keys(typeChart).forEach(attackerType => {
+                    const chart = typeChart[attackerType];
+                    if (chart && chart[type] <= 0.5) {
+                        resistances.add(attackerType);
+                    }
+                });
+            });
+            const defensiveScore = Math.min(1, resistances.size / 18);
+
+            // Puntuación combinada
+            return Math.round((offensiveScore * 0.6 + defensiveScore * 0.4) * 100);
+        }
+
+        function TeamBuilder() {
+            const [team, setTeam] = useState([]);
+            const [search, setSearch] = useState('');
+            const [searchResults, setSearchResults] = useState([]);
+            const [score, setScore] = useState(0);
+
+            useEffect(() => {
+                setScore(calculateTeamScore(team));
+            }, [team]);
+
+            useEffect(() => {
+                if (search.length < 2) {
+                    setSearchResults([]);
+                    return;
+                }
+
+                const fetchPokemon = async () => {
+                    try {
+                        const res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=9999`);
+                        const data = await res.json();
+                        const filtered = data.results
+                            .filter(p => p.name.toLowerCase().includes(search.toLowerCase()))
+                            .slice(0, 8);
+
+                        const detailed = await Promise.all(
+                            filtered.map(async (p) => {
+                                const pokeRes = await fetch(p.url);
+                                const pokeData = await pokeRes.json();
+                                return {
+                                    id: pokeData.id,
+                                    name: pokeData.name,
+                                    types: pokeData.types.map(t => t.type.name),
+                                    sprite: pokeData.sprites.front_default
+                                };
+                            })
+                        );
+                        setSearchResults(detailed);
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                };
+
+                const timer = setTimeout(fetchPokemon, 300);
+                return () => clearTimeout(timer);
+            }, [search]);
+
+            const addToTeam = (pokemon) => {
+                if (team.length >= 6 || team.some(p => p.id === pokemon.id)) return;
+                setTeam([...team, pokemon]);
+                setSearch('');
+                setSearchResults([]);
+            };
+
+            const removeFromTeam = (index) => {
+                const newTeam = [...team];
+                newTeam.splice(index, 1);
+                setTeam(newTeam);
+            };
+
+            return (
+                <div className="container">
+                    <h1 class="titulo">Constructor de Equipos</h1>
+                    
+                    <div className="search-box">
+                        <input
+                            id="search-input"
+                            type="text"
+                            placeholder="Buscar Pokémon (mín. 2 letras)..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                        {searchResults.length > 0 && (
+                            <div className="results" style={{ display: 'block' }}>
+                                {searchResults.map(pokemon => (
+                                    <div
+                                        key={pokemon.id}
+                                        className="result-item"
+                                        onClick={() => addToTeam(pokemon)}
+                                    >
+                                        <img src={pokemon.sprite} alt={pokemon.name} />
+                                        <span>{pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="team">
+                        {team.map((pokemon, index) => (
+                            <div
+                                key={pokemon.id}
+                                className="team-pokemon"
+                                onClick={() => removeFromTeam(index)}
+                                title="Clic para quitar"
+                            >
+                                <img src={pokemon.sprite} alt={pokemon.name} />
+                                <div className="name">
+                                    {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
+                                </div>
+                            </div>
+                        ))}
+                        {[...Array(6 - team.length)].map((_, i) => (
+                            <div key={`empty-${i}`} className="team-slot">
+                                Vacío
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="analysis">
+                        <div>Puntuación del equipo: <span className="score">{score}/100</span></div>
+                        <div style={{ marginTop: '10px', fontSize: '14px' }}>
+                            {score >= 80 ? '¡Equipo excelente!' :
+                            score >= 60 ? 'Buen equipo' :
+                            score >= 40 ? 'Equipo aceptable' : 'Equipo débil, mejora la sinergia'}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<TeamBuilder />);
+    </script>
+</body>
+</html>
