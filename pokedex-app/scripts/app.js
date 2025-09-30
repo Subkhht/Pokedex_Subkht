@@ -4,14 +4,11 @@ let allPokemon = [];
 let favorites = JSON.parse(localStorage.getItem('pokemon-favorites')) || [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Verificar si estamos en index.html o favorites.html
     const isFavoritesPage = window.location.pathname.endsWith('favorites.html');
 
     if (isFavoritesPage) {
-        // Cargar favoritos
         loadFavoritesView();
     } else {
-        // Cargar Pokédex
         fetchPokemonData();
         const searchInput = document.getElementById('search');
         if (searchInput) {
@@ -24,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-
 async function fetchPokemonData() {
     try {
         const response = await fetch(apiUrl);
@@ -34,9 +30,15 @@ async function fetchPokemonData() {
         console.error('Error fetching Pokémon data:', error);
     }
 }
+
 function displayPokemon(pokemonList) {
     const container = document.getElementById('pokemon-items');
     container.innerHTML = '';
+
+    if (pokemonList.length === 0) {
+        container.innerHTML = '<p class="no-results">No se encontraron Pokémon.</p>';
+        return;
+    }
 
     pokemonList.forEach(pokemon => {
         const card = createPokemonCard(pokemon);
@@ -48,7 +50,6 @@ function createPokemonCard(pokemon) {
     const card = document.createElement('li');
     card.classList.add('pokemon-card');
 
-    // Extraer el ID del Pokémon desde la URL
     const idMatch = pokemon.url.match(/\/pokemon\/(\d+)\//);
     const pokeId = idMatch ? idMatch[1] : '';
 
@@ -69,8 +70,8 @@ function createPokemonCard(pokemon) {
 
     const detailsButton = document.createElement('button');
     detailsButton.textContent = 'Ver detalles';
-    detailsButton.addEventListener('click', async () => {
-        await showPokemonDetails(pokemon.url);
+    detailsButton.addEventListener('click', () => {
+        showPokemonDetails(pokemon.url);
     });
 
     card.appendChild(nameContainer);
@@ -78,31 +79,52 @@ function createPokemonCard(pokemon) {
     return card;
 }
 
-// Función para mostrar los detalles
+// === FUNCIÓN PARA OBTENER CADENA EVOLUTIVA ===
+async function getEvolutionChain(speciesUrl) {
+    try {
+        const speciesResponse = await fetch(speciesUrl);
+        const speciesData = await speciesResponse.json();
+        const evolutionChainUrl = speciesData.evolution_chain.url;
+
+        const chainResponse = await fetch(evolutionChainUrl);
+        const chainData = await chainResponse.json();
+
+        const evolutions = [];
+        let current = chainData.chain;
+
+        while (current) {
+            evolutions.push(current.species.url);
+            current = current.evolves_to.length > 0 ? current.evolves_to[0] : null;
+        }
+
+        return evolutions;
+    } catch (error) {
+        console.error('Error al obtener cadena evolutiva:', error);
+        return [];
+    }
+}
+
+// === MOSTRAR DETALLES DEL POKÉMON ===
 async function showPokemonDetails(url) {
     try {
         const response = await fetch(url);
         const data = await response.json();
 
-        // Verificar si ya está en favoritos
         const isFavorite = favorites.some(fav => fav.url === url);
 
-        // Obtener la descripción (flavor text) en español
         const speciesResponse = await fetch(data.species.url);
         const speciesData = await speciesResponse.json();
 
-        // Buscar la descripción en español
         let description = 'Descripción no disponible.';
         const spanishEntry = speciesData.flavor_text_entries.find(
             entry => entry.language.name === 'es'
         );
         if (spanishEntry) {
             description = spanishEntry.flavor_text
-                .replace(/\f/g, ' ') // Reemplazar saltos de página por espacios
-                .replace(/\s+/g, ' '); // Normalizar espacios
+                .replace(/\f/g, ' ')
+                .replace(/\s+/g, ' ');
         }
 
-        // Generar HTML de estadísticas
         const statsHtml = data.stats.map(stat => `
             <div class="stat-bar">
                 <span class="stat-name">${getStatName(stat.stat.name)}:</span>
@@ -117,24 +139,23 @@ async function showPokemonDetails(url) {
             `<img src="${getTypeIcon(t.type.name)}" alt="Tipo ${t.type.name}" title="${t.type.name}" class="type-icon">`
         ).join('');
 
-        // HTML con switch de favoritos
         const detailsDiv = document.getElementById('details');
         detailsDiv.innerHTML = `
             <h3>${data.name.charAt(0).toUpperCase() + data.name.slice(1)}</h3>
-            <img src="${data.sprites.front_default || 'assets/placeholder.png'}" 
+            <img src="${data.sprites.front_default || '/assets/placeholder.png'}" 
                 alt="${data.name}" 
                 class="pokemon-sprite clickable-sprite"
                 data-pokemon='${JSON.stringify({
             description,
             statsHtml,
-            name: data.name
+            name: data.name,
+            speciesUrl: data.species.url
         })}'>
             <p><strong>ID:</strong> ${data.id}</p>
             <p><strong>Altura:</strong> ${data.height / 10} m</p>
             <p><strong>Peso:</strong> ${data.weight / 10} kg</p>
             <p><strong>Tipo:</strong> ${typesHtml}</p>
             
-            <!-- Switch de favoritos -->
             <div class="favorite-toggle">
                 <label class="favorite-switch">
                     <input type="checkbox" id="fav-switch" ${isFavorite ? 'checked' : ''}>
@@ -167,16 +188,47 @@ async function showPokemonDetails(url) {
             }
         });
 
-        // Añadir evento de clic a la imagen (sin cambios)
+        // Evento de clic en la imagen (con evolución)
         const sprite = detailsDiv.querySelector('.clickable-sprite');
         const extendedDetails = document.getElementById('extended-details');
 
-        sprite.addEventListener('click', () => {
+        sprite.addEventListener('click', async () => {
             if (extendedDetails.style.display === 'block') {
                 extendedDetails.style.display = 'none';
                 sprite.title = 'Clic para ver descripción y estadísticas';
             } else {
                 const pokemonData = JSON.parse(sprite.dataset.pokemon);
+
+                // Obtener cadena evolutiva
+                const evolutionUrls = await getEvolutionChain(pokemonData.speciesUrl);
+
+                let evolutionHtml = '';
+                if (evolutionUrls.length > 0) {
+                    const evolutionPromises = evolutionUrls.map(async (url) => {
+                        try {
+                            const res = await fetch(url.replace('pokemon-species', 'pokemon'));
+                            const pokeData = await res.json();
+                            const spriteUrl = pokeData.sprites.front_default || '/assets/placeholder.png';
+                            return `
+                                <div class="evo-item">
+                                    <img src="${spriteUrl}" alt="${pokeData.name}" class="evo-sprite">
+                                    <div class="evo-name">${pokeData.name.charAt(0).toUpperCase() + pokeData.name.slice(1)}</div>
+                                </div>
+                            `;
+                        } catch {
+                            return `<div class="evo-item">?</div>`;
+                        }
+                    });
+
+                    const evoItems = await Promise.all(evolutionPromises);
+                    evolutionHtml = `
+                        <h4>Línea Evolutiva</h4>
+                        <div class="evolution-chain">
+                            ${evoItems.join('<div class="evo-arrow">↓</div>')}
+                        </div>
+                    `;
+                }
+
                 extendedDetails.innerHTML = `
                     <h4>Descripción</h4>
                     <p class="description">${pokemonData.description}</p>
@@ -184,13 +236,13 @@ async function showPokemonDetails(url) {
                     <div class="stats-container">
                         ${pokemonData.statsHtml}
                     </div>
+                    ${evolutionHtml}
                 `;
                 extendedDetails.style.display = 'block';
                 sprite.title = 'Clic para ocultar detalles';
             }
         });
 
-        // Scroll suave
         document.getElementById('pokemon-details').scrollIntoView({ behavior: 'smooth' });
     } catch (error) {
         console.error('Error al obtener detalles del Pokémon:', error);
@@ -198,17 +250,16 @@ async function showPokemonDetails(url) {
     }
 }
 
+// === FAVORITOS ===
 async function createFavoriteCard(pokemonData) {
     const card = document.createElement('div');
     card.classList.add('favorite-card');
     card.innerHTML = '<p>Cargando...</p>';
 
     try {
-        // Obtener datos completos del Pokémon
         const response = await fetch(pokemonData.url);
         const data = await response.json();
 
-        // Obtener descripción
         const speciesResponse = await fetch(data.species.url);
         const speciesData = await speciesResponse.json();
         let description = 'Descripción no disponible.';
@@ -221,19 +272,17 @@ async function createFavoriteCard(pokemonData) {
                 .replace(/\s+/g, ' ');
         }
 
-        // Iconos de tipo
         const typesHtml = data.types.map(t =>
             `<img src="${getTypeIcon(t.type.name)}" alt="${t.type.name}" class="type-icon">`
         ).join('');
 
-        // Estadísticas (simplificadas)
         const statsHtml = data.stats.map(stat =>
             `<div><strong>${getStatName(stat.stat.name)}:</strong> ${stat.base_stat}</div>`
         ).join('');
 
         card.innerHTML = `
             <h3>${data.name.charAt(0).toUpperCase() + data.name.slice(1)}</h3>
-            <img src="${data.sprites.front_default || 'assets/placeholder.png'}" 
+            <img src="${data.sprites.front_default || '/assets/placeholder.png'}" 
                 alt="${data.name}" class="pokemon-sprite">
             <p><strong>ID:</strong> #${data.id}</p>
             <p><strong>Tipo:</strong> ${typesHtml}</p>
@@ -244,12 +293,11 @@ async function createFavoriteCard(pokemonData) {
             <button class="remove-favorite" data-name="${data.name}">Eliminar de favoritos</button>
         `;
 
-        // Evento para eliminar
         const removeBtn = card.querySelector('.remove-favorite');
         removeBtn.addEventListener('click', () => {
             favorites = favorites.filter(fav => fav.name !== data.name);
-            localStorage.setItem('pokemon-favorites', JSON.stringify(favorites));
-            loadFavoritesView(); // Recargar vista
+            saveFavorites();
+            loadFavoritesView();
         });
 
     } catch (error) {
@@ -269,7 +317,6 @@ async function loadFavoritesView() {
         return;
     }
 
-    // Crear todas las tarjetas en paralelo
     const cards = await Promise.all(favorites.map(createFavoriteCard));
     cards.forEach(card => container.appendChild(card));
 }
@@ -278,6 +325,7 @@ function saveFavorites() {
     localStorage.setItem('pokemon-favorites', JSON.stringify(favorites));
 }
 
+// === FUNCIONES AUXILIARES ===
 function getTypeIcon(typeName) {
     return `pokedex-app/assets/types/${typeName}.png`;
 }

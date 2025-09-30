@@ -381,21 +381,6 @@ footer {
     }
 }
 
-/* Contenido de pestañas */
-.tab-content {
-    display: none;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.tab-content.active {
-    display: block;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 2rem;
-}
-
 /* Contenedor de favoritos */
 .favorites-list {
     width: 100%;
@@ -527,5 +512,49 @@ input:checked + .slider:before {
         min-width: 340px;
         max-width: 350px;
     }
+}
+
+/* Línea evolutiva */
+.evolution-chain {
+    display: block;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 1rem 0;
+    padding: 1rem;
+    background: #f0f0f0;
+    border-radius: 12px;
+    overflow-x: auto; /* ← Permite scroll horizontal si no cabe */
+    -webkit-overflow-scrolling: touch; /* Suaviza scroll en móviles */
+}
+
+.evo-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 60px;
+}
+
+.evo-sprite {
+    width: 50px;
+    height: 50px;
+    image-rendering: pixelated;
+    object-fit: contain;
+}
+
+.evo-name {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #333;
+    margin-top: 4px;
+    text-align: center;
+}
+
+.evo-arrow {
+    font-size: 1.5rem;
+    color: #e52d27;
+    font-weight: bold;
+    margin: 0 4px;
+    padding-top: 1rem;
 }
 
