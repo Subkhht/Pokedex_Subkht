@@ -200,3 +200,326 @@ footer {
     font-size: 1rem;
     font-weight: normal;
 }
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    body {
+        padding: 0 12px;
+        align-items: stretch;
+    }
+
+    header h1 {
+        font-size: 3.2rem;
+        text-align: center;
+    }
+
+    main {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        width: 100%;
+        max-width: 500px;
+        margin: 1.5rem auto;
+    }
+
+    .pokedex,
+    .pokedex-details {
+        min-width: unset;
+        max-width: 100%;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    #search {
+        width: 96%;
+    }
+
+    #details img {
+        width: 100px;
+        height: 100px;
+    }
+
+    .pokemon-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .name-container {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .pokemon-card button {
+        align-self: flex-end;
+        width: 100%;
+        padding: 0.5rem;
+    }
+}
+
+/* Mejora en pantallas muy pequeñas (< 400px) */
+@media (max-width: 400px) {
+    header h1 {
+        font-size: 2.6rem;
+    }
+
+    .pokedex::before,
+    .pokedex-details::before {
+        top: -24px;
+        left: 16px;
+        width: 40px;
+        height: 40px;
+    }
+}
+
+#details .pokemon-sprite {
+    width: 120px;
+    height: 120px;
+    margin: 1rem 0;
+    image-rendering: pixelated;
+    background: #e0e0e0;
+    border-radius: 16px;
+    border: 2px solid #3b4cca;
+    object-fit: contain;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    cursor: pointer;
+}
+
+#details .pokemon-sprite:hover {
+    transform: scale(1.15) rotate(3deg);
+    border-color: #e52d27;
+    box-shadow: 0 4px 12px rgba(229, 45, 39, 0.3);
+}
+
+/* Estilo para la descripción y estadísticas */
+.description {
+    font-style: italic;
+    color: #333;
+    line-height: 1.4;
+    margin: 0.8rem 0;
+}
+
+.stats-container {
+    margin-top: 0.8rem;
+}
+
+.stat-bar {
+    margin: 0.6rem 0;
+}
+
+.stat-name {
+    display: inline-block;
+    width: 90px;
+    font-weight: bold;
+    color: #222;
+}
+
+.stat-value {
+    display: inline-block;
+    width: 30px;
+    text-align: right;
+    font-weight: bold;
+    color: #e52d27;
+}
+
+.bar-container {
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    margin-top: 4px;
+    overflow: hidden;
+}
+
+.bar {
+    height: 100%;
+    background: linear-gradient(90deg, #3b4cca, #e52d27);
+    border-radius: 4px;
+}
+
+/* Cursor de mano en la imagen del Pokémon */
+.pokemon-sprite.clickable-sprite {
+    cursor: pointer;
+}
+
+/* Estilo para las pestañas */
+.tabs {
+    display: flex;
+    justify-content: center; /* ← Esto centra los botones */
+    gap: 1rem;
+    margin: 1.5rem 0 1.5rem;
+    width: 100%;
+    max-width: 500px; /* Evita que se expandan demasiado en 4K */
+    padding: 0 1rem;
+    box-sizing: border-box;
+}
+
+.tab {
+    flex: 1; /* Permite que los botones se ajusten */
+    min-width: 120px; /* Evita que se vuelvan demasiado estrechos */
+    padding: 0.6rem 0.8rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    background: #f0f0f0;
+    border: 2px solid #3b4cca;
+    border-radius: 12px 12px 0 0;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.tab.active {
+    background: #3b4cca;
+    color: white;
+}
+
+/* Contenido de pestañas */
+.tab-content {
+    display: none;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.tab-content.active {
+    display: block;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+}
+
+/* Contenedor de favoritos */
+.favorites-list {
+    width: 100%;
+    max-width: 1000px;
+    padding: 0 1rem;
+}
+
+#favorites-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+/* Tarjeta de favorito (detalles completos) */
+.favorite-card {
+    background: #f8f8f8;
+    border: 8px solid #e52d27;
+    border-radius: 24px;
+    padding: 1.2rem;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.favorite-card h3 {
+    color: #e52d27;
+    margin-top: 0;
+}
+
+.favorite-card img.pokemon-sprite {
+    width: 100px;
+    height: 100px;
+    margin: 0.8rem auto;
+    display: block;
+}
+
+/* Responsive para favoritos */
+@media (max-width: 768px) {
+    .tab-content.active {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #favorites-items {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+    }
+}
+
+/* Switch de favoritos en detalles */
+.favorite-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 1.2rem;
+    justify-content: center;
+}
+
+.fav-label {
+    font-weight: bold;
+    color: #e52d27;
+}
+
+/* Reutilizamos el mismo estilo de switch */
+.favorite-switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 22px;
+}
+
+.favorite-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .2s;
+    border-radius: 22px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .2s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #e52d27;
+}
+
+input:checked + .slider:before {
+    transform: translateX(18px);
+}
+
+/* En pantallas grandes, el contenedor de la Pokédex usa dos columnas */
+@media (min-width: 769px) {
+    #pokedex-view {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 2rem;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+        box-sizing: border-box;
+    }
+
+    /* ¡Clave! Evitar que los hijos se estiren verticalmente */
+    #pokedex-container,
+    #pokemon-details {
+        align-self: flex-start; /* ← Esto evita el estiramiento */
+        width: auto;
+        min-width: 340px;
+        max-width: 350px;
+    }
+}
+
