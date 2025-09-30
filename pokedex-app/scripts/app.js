@@ -3,6 +3,205 @@ const apiUrl = 'https://pokeapi.co/api/v2/pokemon?limit=9999';
 let allPokemon = [];
 let favorites = JSON.parse(localStorage.getItem('pokemon-favorites')) || [];
 
+// Tabla de tipos defensiva (multiplicadores)
+const typeChart = {
+    normal: {
+        rock: 0.5,
+        ghost: 0,
+        steel: 0.5,
+        fighting: 2
+    },
+    fire: {
+        fire: 0.5,
+        water: 0.5,
+        grass: 2,
+        ice: 2,
+        bug: 2,
+        rock: 0.5,
+        dragon: 0.5,
+        steel: 2
+    },
+    water: {
+        fire: 2,
+        water: 0.5,
+        grass: 0.5,
+        ground: 2,
+        rock: 2,
+        dragon: 0.5,
+        steel: 0.5
+    },
+    electric: {
+        electric: 0.5,
+        ground: 0,
+        flying: 2,
+        steel: 0.5,
+        water: 2,
+        grass: 0.5,
+        dragon: 0.5
+    },
+    grass: {
+        fire: 0.5,
+        water: 2,
+        grass: 0.5,
+        poison: 0.5,
+        ground: 2,
+        flying: 0.5,
+        bug: 0.5,
+        rock: 2,
+        dragon: 0.5,
+        steel: 0.5
+    },
+    ice: {
+        fire: 0.5,
+        water: 0.5,
+        grass: 2,
+        ice: 0.5,
+        ground: 2,
+        flying: 2,
+        dragon: 2,
+        steel: 0.5,
+        fighting: 2,
+        rock: 2
+    },
+    fighting: {
+        flying: 0.5,
+        poison: 0.5,
+        psychic: 0.5,
+        bug: 0.5,
+        ghost: 0,
+        dark: 2,
+        steel: 2,
+        ice: 2,
+        normal: 2,
+        rock: 2,
+        fairy: 0.5
+    },
+    poison: {
+        grass: 2,
+        poison: 0.5,
+        ground: 0.5,
+        rock: 0.5,
+        ghost: 0.5,
+        steel: 0,
+        fairy: 2,
+        fighting: 0.5,
+        bug: 0.5
+    },
+    ground: {
+        water: 2,
+        grass: 0.5,
+        ice: 2,
+        poison: 2,
+        rock: 2,
+        electric: 2,
+        bug: 0.5,
+        fighting: 2,
+        steel: 2
+    },
+    flying: {
+        electric: 0.5,
+        ice: 0.5,
+        rock: 0.5,
+        grass: 2,
+        fighting: 2,
+        bug: 2,
+        steel: 0.5,
+        dragon: 0.5
+    },
+    psychic: {
+        fighting: 2,
+        poison: 2,
+        psychic: 0.5,
+        steel: 0.5,
+        dark: 0,
+        ghost: 2
+    },
+    bug: {
+        fire: 0.5,
+        flying: 0.5,
+        rock: 0.5,
+        grass: 2,
+        fighting: 0.5,
+        ground: 0.5,
+        steel: 0.5,
+        fairy: 0.5,
+        dragon: 0.5,
+        psychic: 2,
+        ghost: 0.5,
+        dark: 2
+    },
+    rock: {
+        fire: 2,
+        ice: 2,
+        fighting: 0.5,
+        ground: 0.5,
+        flying: 2,
+        bug: 2,
+        steel: 0.5,
+        water: 2,
+        grass: 0.5
+    },
+    ghost: {
+        normal: 0,
+        psychic: 2,
+        ghost: 2,
+        dark: 0.5,
+        steel: 0.5,
+        poison: 0.5,
+        bug: 0.5
+    },
+    dragon: {
+        ice: 2,
+        dragon: 2,
+        fairy: 0,
+        fire: 0.5,
+        water: 0.5,
+        grass: 0.5,
+        electric: 0.5,
+        steel: 0.5
+    },
+    dark: {
+        fighting: 0.5,
+        dark: 0.5,
+        fairy: 0.5,
+        psychic: 2,
+        ghost: 2,
+        steel: 0.5,
+        bug: 2
+    },
+    steel: {
+        fire: 0.5,
+        water: 0.5,
+        electric: 0.5,
+        ice: 2,
+        rock: 2,
+        fairy: 2,
+        steel: 0.5,
+        normal: 0.5,
+        grass: 0.5,
+        psychic: 0.5,
+        dragon: 0.5,
+        flying: 0.5,
+        bug: 0.5,
+        poison: 0
+    },
+    fairy: {
+        fire: 0.5,
+        poison: 0.5,
+        steel: 0.5,
+        fighting: 2,
+        dragon: 2,
+        dark: 2,
+        bug: 0.5,
+        flying: 0.5,
+        grass: 0.5,
+        ground: 0.5,
+        psychic: 0.5,
+        rock: 0.5,
+        ghost: 0.5
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const isFavoritesPage = window.location.pathname.endsWith('favorites.html');
 
@@ -26,9 +225,8 @@ async function fetchPokemonData() {
         const response = await fetch(apiUrl);
         const data = await response.json();
         allPokemon = data.results;
-        // No mostramos Pokémon al cargar
     } catch (error) {
-        console.error('Error fetching Pokémon data:', error);
+        console.error('Error fetching Pokémon ', error);
     }
 }
 
@@ -80,7 +278,116 @@ function createPokemonCard(pokemon) {
     return card;
 }
 
-// === FUNCIÓN PARA OBTENER CADENA EVOLUTIVA CON CONDICIONES COMPLETAS ===
+// Obtener icono de tipo con la nueva ruta
+function getTypeIcon(typeName) {
+    return `pokedex-app/assets/types/${typeName}.png`;
+}
+
+// Calcular debilidades/resistencias
+function calculateDefensiveMultipliers(types) {
+    const multipliers = {};
+    const allTypes = Object.keys(typeChart);
+
+    allTypes.forEach(type => {
+        let multiplier = 1;
+        types.forEach(pokeType => {
+            if (typeChart[pokeType] && typeChart[pokeType][type] !== undefined) {
+                multiplier *= typeChart[pokeType][type];
+            }
+        });
+        if (multiplier !== 1) {
+            multipliers[type] = multiplier;
+        }
+    });
+
+    return multipliers;
+}
+
+// Generar HTML de defensa con categorías claras e iconos
+function generateDefensiveHtml(multipliers) {
+    const superWeak = [];      // x4
+    const weak = [];           // x2
+    const resistant = [];      // x0.5
+    const superResistant = []; // x0.25
+    const immune = [];         // x0
+
+    Object.entries(multipliers).forEach(([type, mult]) => {
+        if (mult === 0) {
+            immune.push(type);
+        } else if (mult === 0.25) {
+            superResistant.push(type);
+        } else if (mult === 0.5) {
+            resistant.push(type);
+        } else if (mult === 2) {
+            weak.push(type);
+        } else if (mult === 4) {
+            superWeak.push(type);
+        }
+        // Ignoramos x1 (daño normal)
+    });
+
+    let html = '<h4>Tabla de Efectividad</h4><table class="defense-table">';
+
+    // Superdébil a (x4)
+    html += '<tr><td>Superefectivo contra:</td><td>';
+    if (superWeak.length > 0) {
+        html += superWeak.map(type => 
+            `<img src="pokedex-app/assets/types/${type}.png" alt="${type}" title="${type} (x4)" class="type-icon defense-icon">`
+        ).join('');
+    } else {
+        html += 'Ninguno';
+    }
+    html += '</td></tr>';
+
+    // Débil a (x2)
+    html += '<tr><td>Efectivo contra:</td><td>';
+    if (weak.length > 0) {
+        html += weak.map(type => 
+            `<img src="pokedex-app/assets/types/${type}.png" alt="${type}" title="${type} (x2)" class="type-icon defense-icon">`
+        ).join('');
+    } else {
+        html += 'Ninguno';
+    }
+    html += '</td></tr>';
+
+    // Resistente a (x0.5)
+    html += '<tr><td>Debil contra:</td><td>';
+    if (resistant.length > 0) {
+        html += resistant.map(type => 
+            `<img src="pokedex-app/assets/types/${type}.png" alt="${type}" title="${type} (x0.5)" class="type-icon defense-icon">`
+        ).join('');
+    } else {
+        html += 'Ninguno';
+    }
+    html += '</td></tr>';
+
+    // Superresistente a (x0.25)
+    html += '<tr><td>Superdebil contra:</td><td>';
+    if (superResistant.length > 0) {
+        html += superResistant.map(type => 
+            `<img src="pokedex-app/assets/types/${type}.png" alt="${type}" title="${type} (x0.25)" class="type-icon defense-icon">`
+        ).join('');
+    } else {
+        html += 'Ninguno';
+    }
+    html += '</td></tr>';
+
+    // Inmune a (x0)
+    html += '<tr><td>Inmune a:</td><td>';
+    if (immune.length > 0) {
+        html += immune.map(type => 
+            `<img src="pokedex-app/assets/types/${type}.png" alt="${type}" title="${type} (inmune)" class="type-icon defense-icon">`
+        ).join('');
+    } else {
+        html += 'Ninguno';
+    }
+    html += '</td></tr>';
+
+    html += '</table>';
+    return html;
+}
+
+// === FUNCIÓN PARA OBTENER CADENA EVOLUTIVA CON FLECHAS ↓ ===
 async function getEvolutionChain(speciesUrl) {
     try {
         const speciesResponse = await fetch(speciesUrl);
@@ -95,7 +402,7 @@ async function getEvolutionChain(speciesUrl) {
 
         while (current && current.evolves_to.length > 0) {
             const next = current.evolves_to[0];
-            let condition = '→';
+            let condition = '↓'; // ← ¡Cambiado a flecha hacia abajo!
 
             if (next.evolution_details && next.evolution_details.length > 0) {
                 const detail = next.evolution_details[0];
@@ -140,7 +447,6 @@ async function getEvolutionChain(speciesUrl) {
             current = next;
         }
 
-        // Añadir el último Pokémon
         if (current) {
             evolutions.push({
                 speciesUrl: current.species.url,
@@ -190,15 +496,21 @@ async function showPokemonDetails(url) {
             `<img src="${getTypeIcon(t.type.name)}" alt="Tipo ${t.type.name}" title="${t.type.name}" class="type-icon">`
         ).join('');
 
+        // Calcular defensas
+        const pokemonTypes = data.types.map(t => t.type.name);
+        const defensiveMultipliers = calculateDefensiveMultipliers(pokemonTypes);
+        const defensiveHtml = generateDefensiveHtml(defensiveMultipliers);
+
         const detailsDiv = document.getElementById('details');
         detailsDiv.innerHTML = `
             <h3>${data.name.charAt(0).toUpperCase() + data.name.slice(1)}</h3>
-            <img src="${data.sprites.front_default || '/assets/placeholder.png'}" 
+            <img src="${data.sprites.front_default || '/pokedex-app/assets/placeholder.png'}" 
                 alt="${data.name}" 
                 class="pokemon-sprite clickable-sprite"
                 data-pokemon='${JSON.stringify({
             description,
             statsHtml,
+            defensiveHtml,
             name: data.name,
             speciesUrl: data.species.url
         })}'>
@@ -218,7 +530,6 @@ async function showPokemonDetails(url) {
             <div id="extended-details" style="display:none; margin-top: 1.5rem;"></div>
         `;
 
-        // Evento del switch
         const favSwitch = detailsDiv.querySelector('#fav-switch');
         favSwitch.addEventListener('change', () => {
             const isChecked = favSwitch.checked;
@@ -239,39 +550,33 @@ async function showPokemonDetails(url) {
             }
         });
 
-        // Evento de clic en la imagen (con evolución completa)
         const sprite = detailsDiv.querySelector('.clickable-sprite');
         const extendedDetails = document.getElementById('extended-details');
 
         sprite.addEventListener('click', async () => {
             if (extendedDetails.style.display === 'block') {
                 extendedDetails.style.display = 'none';
-                sprite.title = 'Clic para ver descripción y estadísticas';
+                sprite.title = 'Clic para ver más detalles';
             } else {
                 const pokemonData = JSON.parse(sprite.dataset.pokemon);
 
-                // Obtener cadena evolutiva con condiciones
                 const evolutionData = await getEvolutionChain(pokemonData.speciesUrl);
-
                 let evolutionHtml = '';
                 if (evolutionData.length > 0) {
-                    // Obtener datos de todos los Pokémon en la cadena
                     const pokemonPromises = evolutionData.map(async (item) => {
                         try {
                             const res = await fetch(item.speciesUrl.replace('pokemon-species', 'pokemon'));
                             const pokeData = await res.json();
                             return {
                                 name: pokeData.name,
-                                sprite: pokeData.sprites.front_default || '/assets/placeholder.png'
+                                sprite: pokeData.sprites.front_default || '/pokedex-app/assets/placeholder.png'
                             };
                         } catch {
-                            return { name: '?', sprite: '/assets/placeholder.png' };
+                            return { name: '?', sprite: '/pokedex-app/assets/placeholder.png' };
                         }
                     });
 
                     const pokemonList = await Promise.all(pokemonPromises);
-
-                    // Generar HTML
                     let evoHtml = '';
                     for (let i = 0; i < pokemonList.length; i++) {
                         evoHtml += `
@@ -300,6 +605,7 @@ async function showPokemonDetails(url) {
                     <div class="stats-container">
                         ${pokemonData.statsHtml}
                     </div>
+                    ${pokemonData.defensiveHtml}
                     ${evolutionHtml}
                 `;
                 extendedDetails.style.display = 'block';
@@ -344,15 +650,21 @@ async function createFavoriteCard(pokemonData) {
             `<div><strong>${getStatName(stat.stat.name)}:</strong> ${stat.base_stat}</div>`
         ).join('');
 
+        // Calcular defensas para favoritos
+        const pokemonTypes = data.types.map(t => t.type.name);
+        const defensiveMultipliers = calculateDefensiveMultipliers(pokemonTypes);
+        const defensiveHtml = generateDefensiveHtml(defensiveMultipliers);
+
         card.innerHTML = `
             <h3>${data.name.charAt(0).toUpperCase() + data.name.slice(1)}</h3>
-            <img src="${data.sprites.front_default || '/assets/placeholder.png'}" 
+            <img src="${data.sprites.front_default || '/pokedex-app/assets/placeholder.png'}" 
                 alt="${data.name}" class="pokemon-sprite">
             <p><strong>ID:</strong> #${data.id}</p>
             <p><strong>Tipo:</strong> ${typesHtml}</p>
             <p><strong>Altura:</strong> ${data.height / 10} m</p>
             <p><strong>Peso:</strong> ${data.weight / 10} kg</p>
             <div class="stats">${statsHtml}</div>
+            ${defensiveHtml}
             <p class="description">${description}</p>
             <button class="remove-favorite" data-name="${data.name}">Eliminar de favoritos</button>
         `;
@@ -387,11 +699,6 @@ async function loadFavoritesView() {
 
 function saveFavorites() {
     localStorage.setItem('pokemon-favorites', JSON.stringify(favorites));
-}
-
-// === FUNCIONES AUXILIARES ===
-function getTypeIcon(typeName) {
-    return `pokedex-app/assets/types/${typeName}.png`;
 }
 
 function getStatName(statName) {

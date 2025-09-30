@@ -559,3 +559,40 @@ input:checked + .slider:before {
     padding-top: 1rem;
 }
 
+/* === TABLA DE DEFENSA === */
+.defense-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    background: #f8f8f8;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.defense-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 0.95rem;
+}
+
+.defense-table td:first-child {
+    font-weight: bold;
+    color: #333;
+    width: 180px;
+    background: #f0f0f0;
+}
+
+.defense-icon {
+    width: 26px;
+    height: 26px;
+    margin: 0 3px;
+    vertical-align: middle;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+/* Colores opcionales (puedes quitarlos si prefieres los iconos tal cual) */
+.defense-icon:hover {
+    transform: scale(1.15);
+    transition: transform 0.2s;
+}
