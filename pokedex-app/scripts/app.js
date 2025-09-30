@@ -26,6 +26,7 @@ async function fetchPokemonData() {
         const response = await fetch(apiUrl);
         const data = await response.json();
         allPokemon = data.results;
+        // No mostramos Pokémon al cargar
     } catch (error) {
         console.error('Error fetching Pokémon data:', error);
     }
@@ -79,7 +80,7 @@ function createPokemonCard(pokemon) {
     return card;
 }
 
-// === FUNCIÓN PARA OBTENER CADENA EVOLUTIVA ===
+// === FUNCIÓN PARA OBTENER CADENA EVOLUTIVA CON CONDICIONES COMPLETAS ===
 async function getEvolutionChain(speciesUrl) {
     try {
         const speciesResponse = await fetch(speciesUrl);
@@ -92,9 +93,59 @@ async function getEvolutionChain(speciesUrl) {
         const evolutions = [];
         let current = chainData.chain;
 
-        while (current) {
-            evolutions.push(current.species.url);
-            current = current.evolves_to.length > 0 ? current.evolves_to[0] : null;
+        while (current && current.evolves_to.length > 0) {
+            const next = current.evolves_to[0];
+            let condition = '→';
+
+            if (next.evolution_details && next.evolution_details.length > 0) {
+                const detail = next.evolution_details[0];
+                const trigger = detail.trigger.name;
+
+                if (trigger === 'level-up') {
+                    if (detail.min_level) {
+                        condition = `↓ lvl ${detail.min_level}`;
+                    } else if (detail.time_of_day) {
+                        condition = `↓ ${detail.time_of_day === 'day' ? 'de día' : 'de noche'}`;
+                    } else if (detail.min_happiness) {
+                        condition = `↓ por Amistad`;
+                    } else if (detail.known_move_type) {
+                        const moveType = detail.known_move_type.name
+                            .replace(/-/g, ' ')
+                            .replace(/\b\w/g, l => l.toUpperCase());
+                        condition = `↓ con movimiento ${moveType}`;
+                    } else {
+                        condition = '↓ al subir nivel';
+                    }
+                } else if (trigger === 'use-item' && detail.item) {
+                    const stoneName = detail.item.name
+                        .replace(/-stone$/, '')
+                        .replace(/-/g, ' ')
+                        .replace(/\b\w/g, l => l.toUpperCase());
+                    condition = `↓ con Piedra ${stoneName}`;
+                } else if (trigger === 'trade') {
+                    condition = '↓ al Intercambiar';
+                } else if (trigger === 'shed') {
+                    condition = '↓ al Mudar';
+                } else if (trigger === 'spin') {
+                    condition = '↓ al Girar';
+                } else {
+                    condition = '↓';
+                }
+            }
+
+            evolutions.push({
+                speciesUrl: current.species.url,
+                condition: condition
+            });
+            current = next;
+        }
+
+        // Añadir el último Pokémon
+        if (current) {
+            evolutions.push({
+                speciesUrl: current.species.url,
+                condition: null
+            });
         }
 
         return evolutions;
@@ -188,7 +239,7 @@ async function showPokemonDetails(url) {
             }
         });
 
-        // Evento de clic en la imagen (con evolución)
+        // Evento de clic en la imagen (con evolución completa)
         const sprite = detailsDiv.querySelector('.clickable-sprite');
         const extendedDetails = document.getElementById('extended-details');
 
@@ -199,32 +250,45 @@ async function showPokemonDetails(url) {
             } else {
                 const pokemonData = JSON.parse(sprite.dataset.pokemon);
 
-                // Obtener cadena evolutiva
-                const evolutionUrls = await getEvolutionChain(pokemonData.speciesUrl);
+                // Obtener cadena evolutiva con condiciones
+                const evolutionData = await getEvolutionChain(pokemonData.speciesUrl);
 
                 let evolutionHtml = '';
-                if (evolutionUrls.length > 0) {
-                    const evolutionPromises = evolutionUrls.map(async (url) => {
+                if (evolutionData.length > 0) {
+                    // Obtener datos de todos los Pokémon en la cadena
+                    const pokemonPromises = evolutionData.map(async (item) => {
                         try {
-                            const res = await fetch(url.replace('pokemon-species', 'pokemon'));
+                            const res = await fetch(item.speciesUrl.replace('pokemon-species', 'pokemon'));
                             const pokeData = await res.json();
-                            const spriteUrl = pokeData.sprites.front_default || '/assets/placeholder.png';
-                            return `
-                                <div class="evo-item">
-                                    <img src="${spriteUrl}" alt="${pokeData.name}" class="evo-sprite">
-                                    <div class="evo-name">${pokeData.name.charAt(0).toUpperCase() + pokeData.name.slice(1)}</div>
-                                </div>
-                            `;
+                            return {
+                                name: pokeData.name,
+                                sprite: pokeData.sprites.front_default || '/assets/placeholder.png'
+                            };
                         } catch {
-                            return `<div class="evo-item">?</div>`;
+                            return { name: '?', sprite: '/assets/placeholder.png' };
                         }
                     });
 
-                    const evoItems = await Promise.all(evolutionPromises);
+                    const pokemonList = await Promise.all(pokemonPromises);
+
+                    // Generar HTML
+                    let evoHtml = '';
+                    for (let i = 0; i < pokemonList.length; i++) {
+                        evoHtml += `
+                            <div class="evo-item">
+                                <img src="${pokemonList[i].sprite}" alt="${pokemonList[i].name}" class="evo-sprite">
+                                <div class="evo-name">${pokemonList[i].name.charAt(0).toUpperCase() + pokemonList[i].name.slice(1)}</div>
+                            </div>
+                        `;
+                        if (i < evolutionData.length && evolutionData[i].condition) {
+                            evoHtml += `<div class="evo-arrow">${evolutionData[i].condition}</div>`;
+                        }
+                    }
+
                     evolutionHtml = `
                         <h4>Línea Evolutiva</h4>
                         <div class="evolution-chain">
-                            ${evoItems.join('<div class="evo-arrow">↓</div>')}
+                            ${evoHtml}
                         </div>
                     `;
                 }
