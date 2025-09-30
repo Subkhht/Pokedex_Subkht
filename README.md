@@ -6,15 +6,15 @@
 
 ````
 pokedex-app 
-├── src 
-│ ├── index.html # Documento HTML principal 
+│ ├── index.html # Documento HTML principal
+| ├── favorites.html # Documento HTML de favoritos 
 │ ├── styles 
 │ │ └── main.css # Estilos de la aplicación 
 │ ├── scripts 
 │ │ └── app.js # Lógica JavaScript para obtener y mostrar los Pokémon 
-│ └── assets 
-│ └── types # Imágenes de los tipos de Pokémon (bug.png, fire.png, etc.) 
-│ └── pokedex.png # Icono de Pokédex para la pestaña 
+│ └── assets
+│   └── pokedex.png # Icono de Pokédex para la pestaña
+│   └── types # Imágenes de los tipos de Pokémon (bug.png, fire.png, etc.)  
 └── README.md # Documentación del proyecto
 ````
 
