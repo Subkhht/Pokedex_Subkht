@@ -114,6 +114,7 @@
 </head>
 <body>
     <header>
+    <button id="theme-toggle" class="theme-toggle" aria-label="Cambiar tema"></button>
         <h1>Pokédex</h1>
         <nav class="top-nav">
             <a href="index.html" class="nav-link">Pokédex</a>
@@ -311,5 +312,37 @@
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<TeamBuilder />);
     </script>
+    <script>
+// === MODO OSCURO PARA TEAM BUILDER ===
+document.addEventListener('DOMContentLoaded', () => {
+    const themeToggle = document.getElementById('theme-toggle');
+    if (!themeToggle) return;
+
+    // Cargar tema guardado
+    const currentTheme = localStorage.getItem('pokedex-theme') || 'light';
+    if (currentTheme === 'dark') {
+        document.body.classList.add('dark-theme');
+        themeToggle.classList.add('moon-icon');
+    } else {
+        themeToggle.classList.add('sun-icon');
+    }
+
+    // Cambiar tema
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-theme');
+        const isDark = document.body.classList.contains('dark-theme');
+        
+        if (isDark) {
+            themeToggle.classList.remove('sun-icon');
+            themeToggle.classList.add('moon-icon');
+            localStorage.setItem('pokedex-theme', 'dark');
+        } else {
+            themeToggle.classList.remove('moon-icon');
+            themeToggle.classList.add('sun-icon');
+            localStorage.setItem('pokedex-theme', 'light');
+        }
+    });
+});
+</script>
 </body>
 </html>

@@ -328,7 +328,7 @@ function generateDefensiveHtml(multipliers) {
 
     let html = '<h4>Tabla de Efectividad</h4><table class="defense-table">';
 
-    // Superdébil a (x4)
+    // Superefectivo a (x4)
     html += '<tr><td>Superefectivo contra:</td><td>';
     if (superWeak.length > 0) {
         html += superWeak.map(type => 
@@ -339,7 +339,7 @@ function generateDefensiveHtml(multipliers) {
     }
     html += '</td></tr>';
 
-    // Débil a (x2)
+    // Efectivo a (x2)
     html += '<tr><td>Efectivo contra:</td><td>';
     if (weak.length > 0) {
         html += weak.map(type => 
@@ -350,7 +350,7 @@ function generateDefensiveHtml(multipliers) {
     }
     html += '</td></tr>';
 
-    // Resistente a (x0.5)
+    // Debil a (x0.5)
     html += '<tr><td>Debil contra:</td><td>';
     if (resistant.length > 0) {
         html += resistant.map(type => 
@@ -361,7 +361,7 @@ function generateDefensiveHtml(multipliers) {
     }
     html += '</td></tr>';
 
-    // Superresistente a (x0.25)
+    // Superdebil a (x0.25)
     html += '<tr><td>Superdebil contra:</td><td>';
     if (superResistant.length > 0) {
         html += superResistant.map(type => 
@@ -697,6 +697,7 @@ async function loadFavoritesView() {
     cards.forEach(card => container.appendChild(card));
 }
 
+// *** EXTRAS ***
 function saveFavorites() {
     localStorage.setItem('pokemon-favorites', JSON.stringify(favorites));
 }
@@ -712,3 +713,34 @@ function getStatName(statName) {
     };
     return names[statName] || statName.charAt(0).toUpperCase() + statName.slice(1);
 }
+
+// === MODO OSCURO ===
+document.addEventListener('DOMContentLoaded', () => {
+    const themeToggle = document.getElementById('theme-toggle');
+    if (!themeToggle) return;
+
+    // Cargar tema guardado
+    const currentTheme = localStorage.getItem('pokedex-theme') || 'light';
+    if (currentTheme === 'dark') {
+        document.body.classList.add('dark-theme');
+        themeToggle.classList.add('moon-icon');
+    } else {
+        themeToggle.classList.add('sun-icon');
+    }
+
+    // Cambiar tema
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-theme');
+        const isDark = document.body.classList.contains('dark-theme');
+        
+        if (isDark) {
+            themeToggle.classList.remove('sun-icon');
+            themeToggle.classList.add('moon-icon');
+            localStorage.setItem('pokedex-theme', 'dark');
+        } else {
+            themeToggle.classList.remove('moon-icon');
+            themeToggle.classList.add('sun-icon');
+            localStorage.setItem('pokedex-theme', 'light');
+        }
+    });
+});
