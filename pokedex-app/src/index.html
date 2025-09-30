@@ -10,36 +10,21 @@
 <body>
     <header>
         <h1>Pokédex</h1>
+        <nav class="top-nav">
+            <a href="index.html" class="nav-link active">Pokédex</a>
+            <a href="favorites.html" class="nav-link">Favoritos</a>
+        </nav>
     </header>
 
-    <!-- Pestañas fuera de main -->
-    <div class="tabs-container">
-        <div class="tabs">
-            <button id="tab-pokedex" class="tab active">Pokédex</button>
-            <button id="tab-favorites" class="tab">Favoritos</button>
-        </div>
-    </div>
-
     <main>
-        <!-- Pestaña 1: Pokédex -->
-        <section id="pokedex-view" class="tab-content active">
-            <div id="pokedex-container" class="pokedex">
-                <h2>Lista de Pokémon</h2>
-                <input type="text" id="search" placeholder="Buscar Pokémon por nombre...">
-                <div id="pokemon-items"></div>
-            </div>
-            <div id="pokemon-details" class="pokedex-details">
-                <h2>Detalles del Pokémon</h2>
-                <div id="details"></div>
-            </div>
+        <section id="pokedex-container" class="pokedex">
+            <h2>Lista de Pokémon</h2>
+            <input type="text" id="search" placeholder="Buscar Pokémon por nombre...">
+            <div id="pokemon-items"></div>
         </section>
-
-        <!-- Pestaña 2: Favoritos -->
-        <section id="favorites-view" class="tab-content">
-            <div id="favorites-container" class="favorites-list">
-                <h2 style="background-color: brown; text-align: center;">Mis Pokémon Favoritos</h2>
-                <div id="favorites-items"></div>
-            </div>
+        <section id="pokemon-details" class="pokedex-details">
+            <h2>Detalles del Pokémon</h2>
+            <div id="details"></div>
         </section>
     </main>
 

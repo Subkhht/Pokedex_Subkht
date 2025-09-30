@@ -343,36 +343,42 @@ footer {
     cursor: pointer;
 }
 
-/* Estilo para las pestañas */
-.tabs {
+/* Navegación superior */
+.top-nav {
     display: flex;
-    justify-content: center; /* ← Esto centra los botones */
-    gap: 1rem;
-    margin: 1.5rem 0 1.5rem;
-    width: 100%;
-    max-width: 500px; /* Evita que se expandan demasiado en 4K */
-    padding: 0 1rem;
-    box-sizing: border-box;
+    justify-content: center;
+    gap: 2rem;
+    margin: 1rem 0;
 }
 
-.tab {
-    flex: 1; /* Permite que los botones se ajusten */
-    min-width: 120px; /* Evita que se vuelvan demasiado estrechos */
-    padding: 0.6rem 0.8rem;
+.nav-link {
+    padding: 0.6rem 1.2rem;
     font-size: 1.1rem;
     font-weight: bold;
     background: #f0f0f0;
     border: 2px solid #3b4cca;
     border-radius: 12px 12px 0 0;
-    cursor: pointer;
+    color: #333;
+    text-decoration: none;
     transition: all 0.2s;
-    text-align: center;
-    white-space: nowrap;
 }
 
-.tab.active {
+.nav-link.active,
+.nav-link:hover {
     background: #3b4cca;
     color: white;
+}
+
+/* En móviles */
+@media (max-width: 768px) {
+    .top-nav {
+        gap: 1rem;
+    }
+
+    .nav-link {
+        padding: 0.5rem 0.8rem;
+        font-size: 1rem;
+    }
 }
 
 /* Contenido de pestañas */

@@ -4,30 +4,24 @@ let allPokemon = [];
 let favorites = JSON.parse(localStorage.getItem('pokemon-favorites')) || [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    fetchPokemonData();
-    const searchInput = document.getElementById('search');
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            const filtered = allPokemon.filter(p => p.name.includes(searchTerm));
-            displayPokemon(filtered);
-        });
-    }
-    // Pestañas
-    document.getElementById('tab-pokedex').addEventListener('click', () => {
-        document.getElementById('tab-pokedex').classList.add('active');
-        document.getElementById('tab-favorites').classList.remove('active');
-        document.getElementById('pokedex-view').classList.add('active');
-        document.getElementById('favorites-view').classList.remove('active');
-    });
+    // Verificar si estamos en index.html o favorites.html
+    const isFavoritesPage = window.location.pathname.endsWith('favorites.html');
 
-    document.getElementById('tab-favorites').addEventListener('click', () => {
-        document.getElementById('tab-favorites').classList.add('active');
-        document.getElementById('tab-pokedex').classList.remove('active');
-        document.getElementById('favorites-view').classList.add('active');
-        document.getElementById('pokedex-view').classList.remove('active');
-        loadFavoritesView(); // Cargar favoritos al entrar
-    });
+    if (isFavoritesPage) {
+        // Cargar favoritos
+        loadFavoritesView();
+    } else {
+        // Cargar Pokédex
+        fetchPokemonData();
+        const searchInput = document.getElementById('search');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const filtered = allPokemon.filter(p => p.name.includes(searchTerm));
+                displayPokemon(filtered);
+            });
+        }
+    }
 });
 
 
