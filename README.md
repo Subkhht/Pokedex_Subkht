@@ -1,131 +1,53 @@
-# 🎮 Pokédex Interactiva
+# Aplicación Pokédex
 
-Una aplicación web moderna y completa para explorar el mundo Pokémon con funcionalidades avanzadas y diseño profesional.
+¡Bienvenido/a a la aplicación Pokédex! Este proyecto es una aplicación web sencilla que permite buscar y explorar Pokémon de manera visual.
 
-## ✨ Características Principales
+## Estructura del Proyecto
 
-### 🔍 Exploración de Pokémon
-- **Lista completa** de más de 1000 Pokémon disponibles
-- **Búsqueda inteligente** con debouncing para optimizar rendimiento
-- **Paginación automática** (20 Pokémon por página)
-- **Filtros avanzados** por tipo y generación
-- **Detalles completos** con estadísticas, tipos y evoluciones
-- **Tabla de efectividad** mostrando fortalezas y debilidades
+````
+pokedex-app 
+│ ├── index.html # Documento HTML principal
+| ├── favorites.html # Documento HTML de favoritos
+| ├── team-builder.html # Constructor de equipos
+| ├── battle-simulator # Simulador de batallas 1v1
+│ ├── styles 
+│ │ └── main.css # Estilos de la aplicación 
+│ ├── scripts 
+│ │ └── app.js # Lógica JavaScript para obtener y mostrar los Pokémon 
+│ └── assets
+│   └── pokedex.png # Icono de Pokédex para la pestaña
+│   └── types # Imágenes de los tipos de Pokémon (bug.png, fire.png, etc.)  
+└── README.md # Documentación del proyecto
+````
 
-### 🎨 Diseño y Experiencia de Usuario
-- **Diseño responsivo** que se adapta a todos los dispositivos
-- **Modo oscuro/claro** con persistencia en localStorage
-- **Animaciones fluidas** y transiciones suaves
-- **Efectos hover interactivos** con transformaciones 3D
-- **Loading spinners** animados durante la carga
-- **Scroll to top** button para mejor navegación
+## Cómo usar la Pokédex
 
-### ⚔️ Simulador de Batallas
-- **Sistema de combate** con cálculo de efectividad de tipos
-- **Autocompletado** para búsqueda rápida de Pokémon
-- **Análisis de daño** basado en tipos y estadísticas
-- **Animaciones de batalla** con efectos visuales (shake, pulse, glow)
-- **Cálculo de ventajas** y desventajas en tiempo real
+1. **Clona el repositorio**:
+   
+   ``git clone <repository-url>``
+   
 
-### ⭐ Sistema de Favoritos
-- **Guarda tus Pokémon favoritos** con persistencia
-- **Vista detallada** de cada favorito
-- **Gestión fácil** para agregar o eliminar
-- **Grid responsivo** adaptable
+2. **Navega al directorio del proyecto**:
+   
+   ``cd pokedex-app``
+   
+3. **Abre el archivo `index.html`** en tu navegador para ver la aplicación.
 
-### 🛠️ Constructor de Equipos
-- **Crea equipos personalizados** de hasta 6 Pokémon
-- **Análisis de cobertura** de tipos del equipo
-- **Evaluación de fortalezas** y debilidades
+## Características
 
-## 🚀 Tecnologías Utilizadas
+- **Búsqueda por nombre:** Escribe el nombre de un Pokémon para buscarlo. No se muestran resultados hasta que escribes.
+- **Lista visual:** Los Pokémon aparecen en tarjetas con su nombre y número.
+- **Ver detalles:** Al hacer clic en "Ver detalles", se muestra la imagen, número, altura, peso y tipos del Pokémon.
+- **Tipos visuales:** Los tipos aparecen como "badges" coloridos con su icono, integrados en la ficha.
+- **Scroll automático:** Al ver detalles, la página sube automáticamente a la sección de detalles.
+- **Diseño tipo Pokédex:** Inspirado en la Pokédex clásica, con colores y bordes característicos.
+- **Cantidad de Pokémon:** Trae los 1025 Pokémon actuales
 
-- **HTML5** - Estructura semántica y accesible
-- **CSS3** - Diseño moderno con animaciones y gradientes
-- **JavaScript ES6+** - Programación funcional y async/await
-- **PokéAPI** - Base de datos completa de Pokémon
-- **LocalStorage** - Persistencia de datos del usuario
+## Tecnologías utilizadas
 
-## 📦 Estructura del Proyecto
-
-```
-Pokedex_Subkht/
-├── index.html              # Página principal
-├── favorites.html          # Página de favoritos
-├── team-builder.html       # Constructor de equipos
-├── battle_simulador.html   # Simulador de batallas
-└── pokedex-app/
-    ├── assets/             # Imágenes e iconos
-    ├── scripts/            # Lógica JavaScript
-    └── styles/             # Estilos CSS
-```
-
-## 🎯 Mejoras Implementadas
-
-### 1. Animaciones CSS Avanzadas
-- Fade in up para elementos
-- Pulse animations para indicadores
-- Shimmer effect en barras de estadísticas
-- Hover effects con transformaciones 3D
-- Background animations sutiles
-
-### 2. Sistema de Filtros Inteligente
-- Filtro por tipo (18 tipos disponibles)
-- Filtro por generación (Gen I-VIII)
-- Combinación de múltiples filtros
-- Botón de reset para limpiar filtros
-
-### 3. Interfaz Mejorada
-- Gradientes animados en el fondo
-- Sombras dinámicas con profundidad
-- Transiciones suaves en interacciones
-- Feedback visual inmediato
-
-### 4. JavaScript Optimizado
-- Función debounce para búsquedas eficientes
-- Error handling robusto
-- Async/await para llamadas a la API
-- Paginación para mejor rendimiento
-
-## 📱 Responsive Design
-
-Optimizado para:
-- **Desktop** (1920px+)
-- **Laptop** (1024px - 1919px)
-- **Tablet** (768px - 1023px)
-- **Mobile** (320px - 767px)
-
-## 🔧 Cómo Usar
-
-1. **Clonar el repositorio**
-```bash
-git clone https://github.com/Subkhht/Pokedex_Subkht.git
-```
-
-2. **Abrir el proyecto**
-   - Simplemente abre `index.html` en tu navegador
-   - No requiere instalación de dependencias
-
-3. **Explorar**
-   - Usa la barra de búsqueda para encontrar Pokémon
-   - Aplica filtros por tipo y generación
-   - Haz clic en "Ver detalles" para información completa
-   - Prueba el simulador de batallas
-   - Guarda tus favoritos
-
-## 👤 Autor
-
-**Subkht**
-- GitHub: [@Subkhht](https://github.com/Subkhht)
-
-## 🙏 Agradecimientos
-
-- [PokéAPI](https://pokeapi.co/) - Por proporcionar los datos de Pokémon
-- Nintendo/Game Freak - Por crear el universo Pokémon
-
----
-
-⭐ Si te gusta este proyecto, ¡dale una estrella en GitHub!
+- HTML
+- CSS
+- JavaScript
 - [PokéAPI](https://pokeapi.co/) para obtener los datos de los Pokémon
 
 ## Recursos adicionales
