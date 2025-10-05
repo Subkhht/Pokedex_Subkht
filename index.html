@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokédex</title>
+    <meta name="description" content="Pokédex interactiva con información detallada de todos los Pokémon, estadísticas, tipos, evoluciones y simulador de batallas.">
+    <meta name="keywords" content="Pokédex, Pokémon, estadísticas, tipos, evoluciones, simulador batallas, favoritos">
+    <meta name="author" content="Subkht">
+    <meta name="theme-color" content="#e52d27">
+    <title>Pokédex Interactiva - Explora todos los Pokémon</title>
     <link rel="stylesheet" href="pokedex-app/styles/main.css">
     <link rel="icon" type="image/png" href="pokedex-app/assets/pokedex.png">
 </head>
@@ -22,14 +26,61 @@
     <main>
         <section id="pokedex-container" class="pokedex">
             <h2>Lista de Pokémon</h2>
-            <input type="text" id="search" placeholder="Buscar Pokémon por nombre...">
+            <input type="text" id="search" placeholder="Buscar Pokémon por nombre..." aria-label="Buscar Pokémon">
+            
+            <div class="filter-container">
+                <div class="filter-group">
+                    <label for="type-filter">Tipo:</label>
+                    <select id="type-filter" class="filter-select" aria-label="Filtrar por tipo">
+                        <option value="">Todos</option>
+                        <option value="normal">Normal</option>
+                        <option value="fire">Fuego</option>
+                        <option value="water">Agua</option>
+                        <option value="electric">Eléctrico</option>
+                        <option value="grass">Planta</option>
+                        <option value="ice">Hielo</option>
+                        <option value="fighting">Lucha</option>
+                        <option value="poison">Veneno</option>
+                        <option value="ground">Tierra</option>
+                        <option value="flying">Volador</option>
+                        <option value="psychic">Psíquico</option>
+                        <option value="bug">Bicho</option>
+                        <option value="rock">Roca</option>
+                        <option value="ghost">Fantasma</option>
+                        <option value="dragon">Dragón</option>
+                        <option value="dark">Siniestro</option>
+                        <option value="steel">Acero</option>
+                        <option value="fairy">Hada</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="gen-filter">Generación:</label>
+                    <select id="gen-filter" class="filter-select" aria-label="Filtrar por generación">
+                        <option value="">Todas</option>
+                        <option value="1">Gen I (1-151)</option>
+                        <option value="2">Gen II (152-251)</option>
+                        <option value="3">Gen III (252-386)</option>
+                        <option value="4">Gen IV (387-493)</option>
+                        <option value="5">Gen V (494-649)</option>
+                        <option value="6">Gen VI (650-721)</option>
+                        <option value="7">Gen VII (722-809)</option>
+                        <option value="8">Gen VIII (810-905)</option>
+                    </select>
+                </div>
+                
+                <button class="reset-filters" id="reset-filters" aria-label="Reiniciar filtros">🔄 Reiniciar</button>
+            </div>
+            
             <div id="pokemon-items"></div>
         </section>
         <section id="pokemon-details" class="pokedex-details">
             <h2>Detalles del Pokémon</h2>
-            <div id="details"></div>
+            <div id="details">Selecciona un Pokémon para ver sus detalles</div>
         </section>
     </main>
+
+    <button class="scroll-top" id="scroll-top" aria-label="Volver arriba">↑</button>
 
     <footer>
         <p>&copy; 2025 Pokédex por Subkht</p>

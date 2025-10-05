@@ -6,12 +6,37 @@ body {
     flex-direction: column;
     align-items: center;
     font-family: 'Segoe UI', Arial, sans-serif;
+    transition: background 0.3s ease;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Animación de fondo sutil */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 20% 50%, rgba(255, 203, 5, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(59, 76, 202, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+    animation: bgPulse 15s ease-in-out infinite;
+}
+
+@keyframes bgPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
 }
 
 header {
     margin-top: 2rem;
     color: #fff;
     text-shadow: 2px 2px 8px #b31217;
+    z-index: 1;
+    position: relative;
 }
 
 main {
@@ -21,6 +46,37 @@ main {
     align-items: flex-start;
     gap: 2rem;
     margin: 2rem 0;
+    z-index: 1;
+    position: relative;
+}
+
+/* Animación de aparición */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Loading spinner */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-spinner {
+    border: 4px solid rgba(255, 203, 5, 0.3);
+    border-top: 4px solid #ffcb05;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 2rem auto;
 }
 
 @font-face {
@@ -50,11 +106,18 @@ h1 {
     background: #f8f8f8;
     border: 8px solid #e52d27;
     border-radius: 32px 32px 24px 24px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25), 0 0 0 2px rgba(255,255,255,0.1);
     padding: 2rem 1.5rem 1.5rem 1.5rem;
     min-width: 340px;
     max-width: 350px;
     position: relative;
+    animation: fadeInUp 0.6s ease-out;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pokedex:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 0 2px rgba(255,255,255,0.2);
 }
 
 .pokedex::before {
@@ -68,7 +131,17 @@ h1 {
     background: radial-gradient(circle at 60% 40%, #fff 60%, #3b4cca 100%);
     border: 4px solid #3b4cca;
     border-radius: 50%;
-    box-shadow: 0 2px 8px #888;
+    box-shadow: 0 2px 8px #888, inset 0 2px 4px rgba(255,255,255,0.5);
+    animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 2px 8px #888, inset 0 2px 4px rgba(255,255,255,0.5), 0 0 10px rgba(59,76,202,0.3);
+    }
+    50% {
+        box-shadow: 0 2px 8px #888, inset 0 2px 4px rgba(255,255,255,0.5), 0 0 20px rgba(59,76,202,0.6);
+    }
 }
 
 .pokedex h2 {
@@ -108,6 +181,35 @@ h1 {
     align-items: center;
     justify-content: space-between;
     box-shadow: 0 2px 8px rgba(59,76,202,0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.pokemon-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(59,76,202,0.1), transparent);
+    transition: left 0.5s;
+}
+
+.pokemon-card:hover::before {
+    left: 100%;
+}
+
+.pokemon-card:hover {
+    transform: translateX(5px) scale(1.02);
+    box-shadow: 0 4px 16px rgba(59,76,202,0.2);
+    border-color: #e52d27;
+}
+
+.pokemon-card:active {
+    transform: scale(0.98);
 }
 
 .pokemon-card h2 {
@@ -125,22 +227,57 @@ h1 {
     padding: 0.3rem 0.8rem;
     font-size: 0.95rem;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(59,76,202,0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.pokemon-card button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.pokemon-card button:hover::before {
+    width: 300px;
+    height: 300px;
 }
 
 .pokemon-card button:hover {
     background: linear-gradient(90deg, #e52d27 60%, #3b4cca 100%);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(229,45,39,0.4);
+}
+
+.pokemon-card button:active {
+    transform: scale(0.95);
 }
 
 .pokedex-details {
     background: #f8f8f8;
     border: 8px solid #3b4cca;
     border-radius: 32px 32px 24px 24px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 0 0 2px rgba(255,255,255,0.1);
     padding: 2rem 1.5rem 1.5rem 1.5rem;
     min-width: 320px;
     max-width: 340px;
     position: relative;
+    animation: fadeInUp 0.6s ease-out 0.2s backwards;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pokedex-details:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.25), 0 0 0 2px rgba(255,255,255,0.2);
 }
 
 .pokedex-details::before {
@@ -172,9 +309,22 @@ h1 {
     height: 120px;
     margin: 1rem 0;
     image-rendering: pixelated;
-    background: #e0e0e0;
+    background: linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%);
     border-radius: 16px;
     border: 2px solid #3b4cca;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    cursor: pointer;
+    position: relative;
+}
+
+#details img:hover {
+    transform: scale(1.2) rotate(5deg);
+    border-color: #e52d27;
+    box-shadow: 0 8px 24px rgba(229, 45, 39, 0.4), 0 0 30px rgba(229, 45, 39, 0.2);
+}
+
+#details img:active {
+    transform: scale(1.1) rotate(0deg);
 }
 
 #details p {
@@ -194,6 +344,13 @@ footer {
     margin: 0 4px;
     vertical-align: middle;
     object-fit: contain;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.type-icon:hover {
+    transform: scale(1.3) rotate(10deg);
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
 }
 
 .pokemon-number {
@@ -337,6 +494,26 @@ footer {
     height: 100%;
     background: linear-gradient(90deg, #3b4cca, #e52d27);
     border-radius: 4px;
+    transition: width 1s ease-out, background 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    to {
+        left: 100%;
+    }
 }
 
 /* Cursor de mano en la imagen del Pokémon */
@@ -361,13 +538,41 @@ footer {
     border-radius: 12px 12px 0 0;
     color: #333;
     text-decoration: none;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
 }
 
-.nav-link.active,
+.nav-link::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0;
+    background: #3b4cca;
+    transition: height 0.3s ease;
+    z-index: -1;
+}
+
+.nav-link:hover::before {
+    height: 100%;
+}
+
 .nav-link:hover {
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(59,76,202,0.3);
+}
+
+.nav-link.active {
     background: #3b4cca;
     color: white;
+    box-shadow: 0 4px 12px rgba(59,76,202,0.4);
+}
+
+.nav-link.active::before {
+    height: 100%;
 }
 
 /* En móviles */
@@ -685,4 +890,203 @@ body.dark-theme footer {
 
 .moon-icon::before {
     content: "🌙";
+}
+
+/* === FILTROS AVANZADOS === */
+.filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 1rem 0;
+    padding: 1rem;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    align-items: center;
+    justify-content: center;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-group label {
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.filter-select {
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 2px solid #3b4cca;
+    background: white;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-select:hover {
+    border-color: #e52d27;
+    box-shadow: 0 2px 8px rgba(59,76,202,0.2);
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #e52d27;
+    box-shadow: 0 0 0 3px rgba(229,45,39,0.2);
+}
+
+/* Botón de reset filtros */
+.reset-filters {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 2px solid #e52d27;
+    background: #e52d27;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.reset-filters:hover {
+    background: #b31217;
+    transform: scale(1.05);
+}
+
+/* === TOOLTIPS === */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 8px;
+    position: absolute;
+    z-index: 1000;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* === SKELETON LOADING === */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.skeleton-card {
+    height: 60px;
+    border-radius: 12px;
+    margin: 0.5rem 0;
+}
+
+/* === SCROLL TO TOP BUTTON === */
+.scroll-top {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #3b4cca, #e52d27);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scroll-top.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.scroll-top:hover {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+/* === MEJORAS RESPONSIVE === */
+@media (max-width: 768px) {
+    .filter-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-group {
+        width: 100%;
+    }
+    
+    .filter-select {
+        width: 100%;
+    }
+    
+    .scroll-top {
+        bottom: 1rem;
+        right: 1rem;
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+}
+
+/* Modo oscuro para filtros */
+body.dark-theme .filter-group label {
+    color: #fff;
+}
+
+body.dark-theme .filter-select {
+    background: #3a0a0a;
+    border-color: #d32f2f;
+    color: #fff;
+}
+
+body.dark-theme .filter-container {
+    background: rgba(0,0,0,0.3);
+}
+
+body.dark-theme .skeleton {
+    background: linear-gradient(90deg, #3a0a0a 25%, #4a1a1a 50%, #3a0a0a 75%);
+    background-size: 200% 100%;
 }
