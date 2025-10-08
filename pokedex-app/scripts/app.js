@@ -280,35 +280,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Activar tema oscuro si está guardado
-    const theme = localStorage.getItem('theme');
+    const theme = localStorage.getItem('pokedex-theme') || 'light';
     if (theme === 'dark') {
         document.body.classList.add('dark-theme');
-        updateThemeToggle();
     }
 
     // Listener para cambio de tema
     const themeToggle = document.getElementById('theme-toggle');
     if (themeToggle) {
-        themeToggle.addEventListener('click', toggleTheme);
+        // Inicializar icono
+        const isDark = document.body.classList.contains('dark-theme');
+        themeToggle.className = isDark ? 'theme-toggle moon-icon' : 'theme-toggle sun-icon';
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+            const isDark = document.body.classList.contains('dark-theme');
+            
+            if (isDark) {
+                themeToggle.className = 'theme-toggle moon-icon';
+                localStorage.setItem('pokedex-theme', 'dark');
+            } else {
+                themeToggle.className = 'theme-toggle sun-icon';
+                localStorage.setItem('pokedex-theme', 'light');
+            }
+        });
     }
 });
-
-// Función para cambiar tema
-function toggleTheme() {
-    document.body.classList.toggle('dark-theme');
-    const isDark = document.body.classList.contains('dark-theme');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    updateThemeToggle();
-}
-
-// Actualizar icono del botón de tema
-function updateThemeToggle() {
-    const themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle) {
-        const isDark = document.body.classList.contains('dark-theme');
-        themeToggle.className = isDark ? 'theme-toggle sun-icon' : 'theme-toggle moon-icon';
-    }
-}
 
 async function fetchPokemonData() {
     const container = document.getElementById('pokemon-items');
@@ -1330,37 +1327,8 @@ function getStatName(statName) {
     return names[statName] || statName.charAt(0).toUpperCase() + statName.slice(1);
 }
 
-// === MODO OSCURO ===
+// === FILTROS Y SCROLL TO TOP ===
 document.addEventListener('DOMContentLoaded', () => {
-    const themeToggle = document.getElementById('theme-toggle');
-    if (!themeToggle) return;
-
-    // Cargar tema guardado
-    const currentTheme = localStorage.getItem('pokedex-theme') || 'light';
-    if (currentTheme === 'dark') {
-        document.body.classList.add('dark-theme');
-        themeToggle.classList.add('moon-icon');
-    } else {
-        themeToggle.classList.add('sun-icon');
-    }
-
-    // Cambiar tema
-    themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('dark-theme');
-        const isDark = document.body.classList.contains('dark-theme');
-        
-        if (isDark) {
-            themeToggle.classList.remove('sun-icon');
-            themeToggle.classList.add('moon-icon');
-            localStorage.setItem('pokedex-theme', 'dark');
-        } else {
-            themeToggle.classList.remove('moon-icon');
-            themeToggle.classList.add('sun-icon');
-            localStorage.setItem('pokedex-theme', 'light');
-        }
-    });
-    
-    // === FILTROS Y SCROLL TO TOP ===
     // Configurar filtros
     const typeFilter = document.getElementById('type-filter');
     const genFilter = document.getElementById('gen-filter');

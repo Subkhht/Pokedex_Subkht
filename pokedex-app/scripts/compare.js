@@ -16,11 +16,11 @@ if (currentTheme === 'dark') {
 // Toggle tema
 const themeToggle = document.getElementById('theme-toggle');
 if (themeToggle) {
-    themeToggle.className = currentTheme === 'dark' ? 'theme-toggle sun-icon' : 'theme-toggle moon-icon';
+    themeToggle.className = currentTheme === 'dark' ? 'theme-toggle moon-icon' : 'theme-toggle sun-icon';
     themeToggle.addEventListener('click', () => {
         document.body.classList.toggle('dark-theme');
         const isDark = document.body.classList.contains('dark-theme');
-        themeToggle.className = isDark ? 'theme-toggle sun-icon' : 'theme-toggle moon-icon';
+        themeToggle.className = isDark ? 'theme-toggle moon-icon' : 'theme-toggle sun-icon';
         localStorage.setItem('pokedex-theme', isDark ? 'dark' : 'light');
         
         // Actualizar gráfico
