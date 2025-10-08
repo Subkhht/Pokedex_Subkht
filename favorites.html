@@ -14,25 +14,62 @@
 <body>
     <header>
         <button id="theme-toggle" class="theme-toggle" aria-label="Cambiar tema"></button>
+        
+        <!-- Selector de idioma -->
+        <div class="language-selector-container">
+            <select id="language-selector" class="language-selector" aria-label="Seleccionar idioma">
+                <option value="es">🇪🇸 Español</option>
+                <option value="en">🇬🇧 English</option>
+                <option value="ja">🇯🇵 日本語</option>
+            </select>
+        </div>
+        
         <h1>Pokédex</h1>
         <nav class="top-nav">
-            <a href="index.html" class="nav-link">Pokédex</a>
-            <a href="favorites.html" class="nav-link active">Favoritos</a>
-            <a href="team-builder.html" class="nav-link">Constructor de Equipos</a>
-            <a href="battle_simulador.html" class="nav-link">Simulador de Batalla</a>
+            <a href="index.html" class="nav-link" data-i18n="nav_pokedex">Pokédex</a>
+            <a href="favorites.html" class="nav-link active" data-i18n="nav_favorites">Favoritos</a>
+            <a href="team-builder.html" class="nav-link" data-i18n="nav_team_builder">Constructor de Equipos</a>
+            <a href="compare.html" class="nav-link" data-i18n="nav_compare">Comparar</a>
         </nav>
     </header>
 
     <main>
         <section id="favorites-container" class="favorites-list">
-            <h2>Mis Pokémon Favoritos</h2>
+            <h2 data-i18n="favorites_title">Mis Pokémon Favoritos</h2>
+            
+            <!-- Filtros para favoritos -->
+            <div class="favorites-filters">
+                <input type="text" 
+                    id="filter-tags" 
+                    data-i18n="filter_tags_placeholder"
+                    placeholder="Filtrar por tags..." 
+                    class="filter-input">
+                <select id="filter-rating" class="filter-select">
+                    <option value="" data-i18n="filter_all_ratings">Todas las calificaciones</option>
+                    <option value="5">★★★★★ 5 estrellas</option>
+                    <option value="4">★★★★ 4+ estrellas</option>
+                    <option value="3">★★★ 3+ estrellas</option>
+                    <option value="2">★★ 2+ estrellas</option>
+                    <option value="1">★ 1+ estrella</option>
+                </select>
+                <select id="sort-favorites" class="filter-select">
+                    <option value="default" data-i18n="sort_default">Orden por defecto</option>
+                    <option value="rating-desc" data-i18n="sort_rating_desc">Mayor calificación</option>
+                    <option value="rating-asc" data-i18n="sort_rating_asc">Menor calificación</option>
+                    <option value="name-asc" data-i18n="sort_name_asc">Nombre (A-Z)</option>
+                    <option value="name-desc" data-i18n="sort_name_desc">Nombre (Z-A)</option>
+                </select>
+            </div>
+            
             <div id="favorites-items"></div>
         </section>
     </main>
 
     <footer>
-        <p>&copy; 2025 Pokédex por Subkht</p>
+        <p data-i18n="footer_text">&copy; 2025 Pokédex por Subkht</p>
     </footer>
+    
+    <script src="pokedex-app/scripts/i18n.js"></script>
     <script src="pokedex-app/scripts/app.js"></script>
 </body>
 </html>

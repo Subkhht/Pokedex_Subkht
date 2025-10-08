@@ -1,0 +1,74 @@
+{
+  "name": "Pokédex Interactiva",
+  "short_name": "Pokédex",
+  "description": "Pokédex interactiva completa con información detallada de todos los Pokémon, estadísticas, comparador y constructor de equipos",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#e52d27",
+  "theme_color": "#e52d27",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/pokedex-app/assets/pokedex.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/pokedex-app/assets/pokedex.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["games", "entertainment", "education"],
+  "lang": "es-ES",
+  "dir": "ltr",
+  "scope": "/",
+  "screenshots": [
+    {
+      "src": "/pokedex-app/assets/pokedex.png",
+      "sizes": "540x720",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Favoritos",
+      "short_name": "Favoritos",
+      "description": "Ver Pokémon favoritos",
+      "url": "/favorites.html",
+      "icons": [
+        {
+          "src": "/pokedex-app/assets/pokedex.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Constructor de Equipos",
+      "short_name": "Equipos",
+      "description": "Construir equipos Pokémon",
+      "url": "/team-builder.html",
+      "icons": [
+        {
+          "src": "/pokedex-app/assets/pokedex.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Comparar",
+      "short_name": "Comparar",
+      "description": "Comparar Pokémon",
+      "url": "/compare.html",
+      "icons": [
+        {
+          "src": "/pokedex-app/assets/pokedex.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false
+}

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Compara dos Pokémon lado a lado con análisis completo de estadísticas, tipos y ventajas.">
+    <meta name="keywords" content="comparar Pokémon, comparación estadísticas, análisis Pokémon">
+    <meta name="author" content="Subkht">
+    <meta name="theme-color" content="#e52d27">
+    <title>Comparar Pokémon - Pokédex</title>
+    <link rel="stylesheet" href="pokedex-app/styles/main.css">
+    <link rel="icon" type="image/png" href="pokedex-app/assets/pokedex.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <style>
+        .compare-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .selection-area {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .pokemon-selector {
+            background: #f8f8f8;
+            border: 8px solid #3b4cca;
+            border-radius: 24px;
+            padding: 1.5rem;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+
+        .pokemon-selector h3 {
+            color: #e52d27;
+            margin-top: 0;
+        }
+
+        .search-input {
+            width: 90%;
+            padding: 0.6rem;
+            border-radius: 8px;
+            border: 2px solid #3b4cca;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .random-btn {
+            background: linear-gradient(90deg, #ffcb05, #e52d27);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .random-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(229,45,39,0.4);
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+            align-items: start;
+        }
+
+        .pokemon-panel {
+            background: #f8f8f8;
+            border: 8px solid #3b4cca;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .pokemon-panel.winner {
+            border-color: #ffcb05;
+            box-shadow: 0 0 30px rgba(255,203,5,0.6);
+        }
+
+        .pokemon-panel img {
+            width: 150px;
+            height: 150px;
+            image-rendering: pixelated;
+            transition: transform 0.3s ease;
+        }
+
+        .pokemon-panel img:hover {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .vs-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
+            color: #e52d27;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: pulse 2s infinite;
+        }
+
+        .stat-comparison {
+            margin: 1rem 0;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .stat-name {
+            font-weight: bold;
+            min-width: 100px;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .stat-value.higher {
+            color: #4caf50;
+            font-size: 1.1rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 2rem 0;
+        }
+
+        .advantage-analysis {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+
+        .advantage-section {
+            margin: 1rem 0;
+        }
+
+        .advantage-section h4 {
+            margin: 0.5rem 0;
+            color: #e52d27;
+        }
+
+        .type-effectiveness {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 0.5rem 0;
+        }
+
+        .effectiveness-badge {
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .super-effective {
+            background: #4caf50;
+        }
+
+        .not-very-effective {
+            background: #ff9800;
+        }
+
+        .no-effect {
+            background: #757575;
+        }
+
+        .winner-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffcb05, #e52d27);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 1rem 0;
+            animation: winnerGlow 1.5s ease-in-out infinite;
+        }
+
+        .total-stats {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #3b4cca;
+            margin: 1rem 0;
+        }
+
+        @media (max-width: 1024px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .vs-divider {
+                transform: rotate(90deg);
+                font-size: 2rem;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes pokemonPulse {
+            0%, 100% { 
+                transform: scale(1);
+                filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+            }
+            50% { 
+                transform: scale(1.08);
+                filter: drop-shadow(0 6px 12px rgba(59, 76, 202, 0.3));
+            }
+        }
+
+        .pokemon-panel img {
+            image-rendering: pixelated;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+            transition: all 0.3s ease;
+        }
+
+        .pokemon-panel:hover img {
+            transform: scale(1.05);
+            filter: drop-shadow(0 8px 16px rgba(59, 76, 202, 0.4));
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <button id="theme-toggle" class="theme-toggle" aria-label="Cambiar tema"></button>
+        
+        <!-- Selector de idioma -->
+        <div class="language-selector-container">
+            <select id="language-selector" class="language-selector" aria-label="Seleccionar idioma">
+                <option value="es">🇪🇸 Español</option>
+                <option value="en">🇬🇧 English</option>
+                <option value="ja">🇯🇵 日本語</option>
+            </select>
+        </div>
+        
+        <h1>Pokédex</h1>
+        <nav class="top-nav">
+            <a href="index.html" class="nav-link" data-i18n="nav_pokedex">Pokédex</a>
+            <a href="favorites.html" class="nav-link" data-i18n="nav_favorites">Favoritos</a>
+            <a href="team-builder.html" class="nav-link" data-i18n="nav_team_builder">Constructor de Equipos</a>
+            <a href="compare.html" class="nav-link active" data-i18n="nav_compare">Comparar</a>
+        </nav>
+    </header>
+
+    <main class="compare-container">
+        <h2 style="text-align: center; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);" data-i18n="compare_title">Comparador de Pokémon</h2>
+        
+        <div class="selection-area">
+            <div class="pokemon-selector">
+                <h3 data-i18n="compare_select1">Pokémon 1</h3>
+                <input type="text" id="search1" class="search-input" placeholder="Buscar Pokémon..." aria-label="Buscar primer Pokémon">
+                <button class="random-btn" id="random1">🎲 <span data-i18n="btn_surprise">Aleatorio</span></button>
+                <div id="selected1" style="margin-top: 1rem; min-height: 50px;"></div>
+            </div>
+
+            <div class="pokemon-selector">
+                <h3 data-i18n="compare_select2">Pokémon 2</h3>
+                <input type="text" id="search2" class="search-input" placeholder="Buscar Pokémon..." aria-label="Buscar segundo Pokémon">
+                <button class="random-btn" id="random2">🎲 <span data-i18n="btn_surprise">Aleatorio</span></button>
+                <div id="selected2" style="margin-top: 1rem; min-height: 50px;"></div>
+            </div>
+        </div>
+
+        <div id="comparison-result" style="display: none;">
+            <div class="comparison-grid">
+                <div class="pokemon-panel" id="panel1">
+                    <div id="pokemon1-details"></div>
+                </div>
+
+                <div class="vs-divider" data-i18n="compare_vs">VS</div>
+
+                <div class="pokemon-panel" id="panel2">
+                    <div id="pokemon2-details"></div>
+                </div>
+            </div>
+
+            <div style="max-width: 800px; margin: 2rem auto;">
+                <h3 style="text-align: center; color: white;" data-i18n="compare_stats_comparison">Comparación de Estadísticas</h3>
+                <div class="chart-container">
+                    <canvas id="statsChart"></canvas>
+                </div>
+            </div>
+
+            <div id="matchup-analysis" style="max-width: 1000px; margin: 2rem auto;"></div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 <span data-i18n="footer_text">Pokédex por Subkht</span></p>
+    </footer>
+
+    <!-- Cargar sistema de idiomas ANTES de compare.js -->
+    <script src="pokedex-app/scripts/i18n.js"></script>
+    <script src="pokedex-app/scripts/compare.js"></script>
+    
+    <script>
+        // Inicializar idioma
+        const languageSelector = document.getElementById('language-selector');
+        const savedLanguage = localStorage.getItem('pokedex-language') || 'es';
+        languageSelector.value = savedLanguage;
+        setLanguage(savedLanguage);
+        
+        languageSelector.addEventListener('change', (e) => {
+            const selectedLang = e.target.value;
+            setLanguage(selectedLang);
+            localStorage.setItem('pokedex-language', selectedLang);
+            
+            // Recrear el gráfico y actualizar análisis si hay Pokémon cargados
+            if (window.pokemon1Data && window.pokemon2Data) {
+                window.createStatsChart();
+                window.displayMatchupAnalysis();
+            }
+        });
+    </script>
+            localStorage.setItem('pokedex-language', selectedLang);
+        });
+    </script>
+</body>
+</html>

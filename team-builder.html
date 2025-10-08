@@ -72,6 +72,21 @@
             width: 60px;
             height: 60px;
             image-rendering: pixelated;
+            animation: teamPokemonFloat 2.5s ease-in-out infinite;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            transition: all 0.3s ease;
+        }
+        .team-pokemon:hover img {
+            transform: scale(1.2) translateY(-5px);
+            filter: drop-shadow(0 6px 12px rgba(59, 76, 202, 0.4));
+        }
+        @keyframes teamPokemonFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
         }
         .team-pokemon .name {
             font-size: 12px;
@@ -113,18 +128,33 @@
             width: 32px;
             height: 32px;
             image-rendering: pixelated;
+            animation: searchResultPulse 2s ease-in-out infinite;
+        }
+        @keyframes searchResultPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
         }
     </style>
 </head>
 <body>
     <header>
     <button id="theme-toggle" class="theme-toggle" aria-label="Cambiar tema"></button>
+        
+        <!-- Selector de idioma -->
+        <div class="language-selector-container">
+            <select id="language-selector" class="language-selector" aria-label="Seleccionar idioma">
+                <option value="es">🇪🇸 Español</option>
+                <option value="en">🇬🇧 English</option>
+                <option value="ja">🇯🇵 日本語</option>
+            </select>
+        </div>
+        
         <h1>Pokédex</h1>
         <nav class="top-nav">
-            <a href="index.html" class="nav-link">Pokédex</a>
-            <a href="favorites.html" class="nav-link">Favoritos</a>
-            <a href="team-builder.html" class="nav-link active" style="text-align: center;">Constructor de Equipos</a>
-            <a href="battle_simulador.html" class="nav-link" style="text-align: center;">Simulador de Batalla</a>
+            <a href="index.html" class="nav-link" data-i18n="nav_pokedex">Pokédex</a>
+            <a href="favorites.html" class="nav-link" data-i18n="nav_favorites">Favoritos</a>
+            <a href="team-builder.html" class="nav-link active" style="text-align: center;" data-i18n="nav_team_builder">Constructor de Equipos</a>
+            <a href="compare.html" class="nav-link" style="text-align: center;" data-i18n="nav_compare">Comparar</a>
         </nav>
     </header>
 
@@ -399,11 +429,13 @@
                             filtered.map(async (p) => {
                                 const pokeRes = await fetch(p.url);
                                 const pokeData = await pokeRes.json();
+                                // Usar sprite animado si está disponible
+                                const animatedSprite = pokeData.sprites.versions?.['generation-v']?.['black-white']?.animated?.front_default;
                                 return {
                                     id: pokeData.id,
                                     name: pokeData.name,
                                     types: pokeData.types.map(t => t.type.name),
-                                    sprite: pokeData.sprites.front_default
+                                    sprite: animatedSprite || pokeData.sprites.front_default
                                 };
                             })
                         );
@@ -526,5 +558,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
+
+<!-- Cargar sistema de idiomas -->
+<script src="pokedex-app/scripts/i18n.js"></script>
+<script>
+    // Inicializar idioma
+    const languageSelector = document.getElementById('language-selector');
+    const savedLanguage = localStorage.getItem('pokedex-language') || 'es';
+    languageSelector.value = savedLanguage;
+    setLanguage(savedLanguage);
+    
+    languageSelector.addEventListener('change', (e) => {
+        const selectedLang = e.target.value;
+        setLanguage(selectedLang);
+        localStorage.setItem('pokedex-language', selectedLang);
+    });
+</script>
+
 </body>
 </html>

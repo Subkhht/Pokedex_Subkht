@@ -3,23 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Pokédex interactiva con información detallada de todos los Pokémon, estadísticas, tipos, evoluciones y simulador de batallas.">
-    <meta name="keywords" content="Pokédex, Pokémon, estadísticas, tipos, evoluciones, simulador batallas, favoritos">
+    <meta name="description" content="Pokédex interactiva con información detallada de todos los Pokémon, estadísticas, tipos, evoluciones y comparador.">
+    <meta name="keywords" content="Pokédex, Pokémon, estadísticas, tipos, evoluciones, comparador, favoritos">
     <meta name="author" content="Subkht">
     <meta name="theme-color" content="#e52d27">
+    
+    <!-- PWA Meta tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Pokédex">
+    <link rel="apple-touch-icon" href="/pokedex-app/assets/pokedex.png">
+    
     <title>Pokédex Interactiva - Explora todos los Pokémon</title>
     <link rel="stylesheet" href="pokedex-app/styles/main.css">
     <link rel="icon" type="image/png" href="pokedex-app/assets/pokedex.png">
+    <link rel="manifest" href="/manifest.json">
 </head>
 <body>
     <header>
         <button id="theme-toggle" class="theme-toggle" aria-label="Cambiar tema"></button>
+        
+        <!-- Selector de idioma -->
+        <div class="language-selector-container">
+            <select id="language-selector" class="language-selector" aria-label="Seleccionar idioma">
+                <option value="es">🇪🇸 Español</option>
+                <option value="en">🇬🇧 English</option>
+                <option value="ja">🇯🇵 日本語</option>
+            </select>
+        </div>
+        
         <h1>Pokédex</h1>
         <nav class="top-nav">
-            <a href="index.html" class="nav-link active">Pokédex</a>
-            <a href="favorites.html" class="nav-link">Favoritos</a>
-            <a href="team-builder.html" class="nav-link">Constructor de Equipos</a>
-            <a href="battle_simulador.html" class="nav-link">Simulador de Batalla</a>
+            <a href="index.html" class="nav-link active" data-i18n="nav_pokedex">Pokédex</a>
+            <a href="favorites.html" class="nav-link" data-i18n="nav_favorites">Favoritos</a>
+            <a href="team-builder.html" class="nav-link" data-i18n="nav_team_builder">Constructor de Equipos</a>
+            <a href="compare.html" class="nav-link" data-i18n="nav_compare">Comparar</a>
         </nav>
     </header>
 
@@ -27,6 +46,19 @@
         <section id="pokedex-container" class="pokedex">
             <h2>Lista de Pokémon</h2>
             <input type="text" id="search" placeholder="Buscar Pokémon por nombre..." aria-label="Buscar Pokémon">
+            
+            <div style="text-align: center; margin: 1rem 0;">
+                <button id="surprise-btn" style="background: linear-gradient(90deg, #ffcb05, #e52d27); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 20px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(229,45,39,0.3);">
+                    🎲 Sorpréndeme!
+                </button>
+            </div>
+            
+            <!-- Botón para mostrar/ocultar filtros avanzados -->
+            <div style="text-align: center; margin: 1rem 0;">
+                <button id="toggle-advanced-filters" style="background: #3b4cca; color: white; border: none; padding: 0.5rem 1rem; border-radius: 10px; cursor: pointer; font-weight: bold; transition: all 0.3s ease;">
+                    🔍 Filtros Avanzados
+                </button>
+            </div>
             
             <div class="filter-container">
                 <div class="filter-group">
@@ -72,6 +104,96 @@
                 <button class="reset-filters" id="reset-filters" aria-label="Reiniciar filtros">🔄 Reiniciar</button>
             </div>
             
+            <!-- Filtros Avanzados (ocultos por defecto) -->
+            <div id="advanced-filters" class="advanced-filters" style="display: none;">
+                <h3 style="margin: 0 0 1rem 0; color: #3b4cca;">Filtros Avanzados</h3>
+                
+                <div class="advanced-filter-grid">
+                    <!-- Filtro por estadísticas -->
+                    <div class="filter-group-advanced">
+                        <label>⚡ Ataque mínimo:</label>
+                        <input type="range" id="min-attack" min="0" max="255" value="0" class="stat-slider">
+                        <span id="attack-value">0</span>
+                    </div>
+                    
+                    <div class="filter-group-advanced">
+                        <label>🛡️ Defensa mínima:</label>
+                        <input type="range" id="min-defense" min="0" max="255" value="0" class="stat-slider">
+                        <span id="defense-value">0</span>
+                    </div>
+                    
+                    <div class="filter-group-advanced">
+                        <label>❤️ HP mínimo:</label>
+                        <input type="range" id="min-hp" min="0" max="255" value="0" class="stat-slider">
+                        <span id="hp-value">0</span>
+                    </div>
+                    
+                    <div class="filter-group-advanced">
+                        <label>💨 Velocidad mínima:</label>
+                        <input type="range" id="min-speed" min="0" max="255" value="0" class="stat-slider">
+                        <span id="speed-value">0</span>
+                    </div>
+                    
+                    <!-- Filtro por habilidad -->
+                    <div class="filter-group-advanced">
+                        <label>🎯 Habilidad:</label>
+                        <input type="text" id="ability-filter" placeholder="Ej: overgrow, blaze..." class="filter-input-small">
+                    </div>
+                    
+                    <!-- Filtro por color -->
+                    <div class="filter-group-advanced">
+                        <label>🎨 Color:</label>
+                        <select id="color-filter" class="filter-select">
+                            <option value="">Todos</option>
+                            <option value="black">Negro</option>
+                            <option value="blue">Azul</option>
+                            <option value="brown">Marrón</option>
+                            <option value="gray">Gris</option>
+                            <option value="green">Verde</option>
+                            <option value="pink">Rosa</option>
+                            <option value="purple">Morado</option>
+                            <option value="red">Rojo</option>
+                            <option value="white">Blanco</option>
+                            <option value="yellow">Amarillo</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Filtro por habitat -->
+                    <div class="filter-group-advanced">
+                        <label>🏞️ Hábitat:</label>
+                        <select id="habitat-filter" class="filter-select">
+                            <option value="">Todos</option>
+                            <option value="cave">Cueva</option>
+                            <option value="forest">Bosque</option>
+                            <option value="grassland">Pradera</option>
+                            <option value="mountain">Montaña</option>
+                            <option value="rare">Raro</option>
+                            <option value="rough-terrain">Terreno accidentado</option>
+                            <option value="sea">Mar</option>
+                            <option value="urban">Urbano</option>
+                            <option value="waters-edge">Orilla del agua</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Filtro por peso -->
+                    <div class="filter-group-advanced">
+                        <label>⚖️ Peso máximo (kg):</label>
+                        <input type="number" id="max-weight" placeholder="Ej: 100" class="filter-input-small" min="0" step="10">
+                    </div>
+                    
+                    <!-- Filtro por altura -->
+                    <div class="filter-group-advanced">
+                        <label>📏 Altura máxima (m):</label>
+                        <input type="number" id="max-height" placeholder="Ej: 5" class="filter-input-small" min="0" step="0.5">
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 1rem;">
+                    <button id="apply-advanced-filters" class="apply-filters-btn">✓ Aplicar Filtros</button>
+                    <button id="clear-advanced-filters" class="clear-filters-btn">✕ Limpiar</button>
+                </div>
+            </div>
+            
             <div id="pokemon-items"></div>
         </section>
         <section id="pokemon-details" class="pokedex-details">
@@ -83,8 +205,83 @@
     <button class="scroll-top" id="scroll-top" aria-label="Volver arriba">↑</button>
 
     <footer>
-        <p>&copy; 2025 Pokédex por Subkht</p>
+        <p data-i18n="footer_text">&copy; 2025 Pokédex por Subkht</p>
+        <div id="pwa-install-prompt" style="display: none; margin-top: 1rem;">
+            <button id="install-pwa-btn" style="background: linear-gradient(90deg, #4CAF50, #45a049); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 10px; cursor: pointer; font-weight: bold; box-shadow: 0 3px 10px rgba(76,175,80,0.3);">
+                📱 Instalar App
+            </button>
+        </div>
+        <div id="offline-indicator" style="display: none; margin-top: 0.5rem; padding: 0.5rem; background: #ff9800; color: white; border-radius: 8px; font-size: 0.9rem;">
+            ⚠️ Sin conexión - Modo offline
+        </div>
     </footer>
+    
+    <script src="pokedex-app/scripts/i18n.js"></script>
     <script src="pokedex-app/scripts/app.js"></script>
+    
+    <!-- Registro de Service Worker -->
+    <script>
+        // Registrar Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then((registration) => {
+                        console.log('✅ Service Worker registrado:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.error('❌ Error al registrar Service Worker:', error);
+                    });
+            });
+        }
+        
+        // Prompt de instalación de PWA
+        let deferredPrompt;
+        const installPrompt = document.getElementById('pwa-install-prompt');
+        const installBtn = document.getElementById('install-pwa-btn');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (installPrompt) {
+                installPrompt.style.display = 'block';
+            }
+        });
+        
+        if (installBtn) {
+            installBtn.addEventListener('click', async () => {
+                if (!deferredPrompt) return;
+                
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`Resultado instalación: ${outcome}`);
+                deferredPrompt = null;
+                if (installPrompt) {
+                    installPrompt.style.display = 'none';
+                }
+            });
+        }
+        
+        window.addEventListener('appinstalled', () => {
+            console.log('✅ PWA instalada exitosamente');
+            deferredPrompt = null;
+        });
+        
+        // Indicador de conexión
+        const offlineIndicator = document.getElementById('offline-indicator');
+        
+        function updateOnlineStatus() {
+            if (offlineIndicator) {
+                if (navigator.onLine) {
+                    offlineIndicator.style.display = 'none';
+                } else {
+                    offlineIndicator.style.display = 'block';
+                }
+            }
+        }
+        
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        updateOnlineStatus();
+    </script>
 </body>
 </html>
